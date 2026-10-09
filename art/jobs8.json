@@ -1,0 +1,3 @@
+[
+ {"name": "hero_sad", "prompt": "hero_sad_messy.txt", "size": "1024x1024", "ref": ["art/ref/hero_sad_braid.png=edit target: change ONLY the hair to a wild tangled mop, no braid"]}
+]

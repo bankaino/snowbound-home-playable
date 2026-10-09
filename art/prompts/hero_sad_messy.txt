@@ -1,0 +1,4 @@
+Use case: main character sprite for a mobile story ad, composited over a background (transparent canvas). This is the "before" state of her hair.
+Edit of Image 2: keep EVERYTHING pixel-identical: the same armchair with the same tears and snow, the same pose, canvas placement, scale, the same face with the same sad worried expression, cold pink cheeks, mustard knit sweater, rolled jeans, bare feet, the baby and the pale-blue blanket, the shading. Change ONLY her hair: instead of the tidy braid it is now a wild, tangled, extremely messy mop of auburn hair with NO braid at all: frizzy, matted, loose, strands sticking out in every direction, hanging over her shoulders and partly over her face, a few snowflakes caught in it. It must clearly look uncombed and neglected, but still cartoon-cute, same auburn colour.
+Composition: identical to Image 2 (same canvas placement, same scale).
+Constraints: one character group only, no background, no ground, no shadow, no text.

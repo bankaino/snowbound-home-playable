@@ -199,6 +199,13 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
   chill 10.2, frozen endcard 16.6 s (END_NO_INPUT 18 so frost ends first). smoke/perf tools wait for phase 'choice' instead of fixed sleeps.
   Trade-off: first interaction now at 4.2 s (ad rules say hook ≤ 3 s) — the `no_story` variant measures exactly this.
 
+## Phase 5e (2026-10-09, user idea: make the comb payoff readable)
+- Before-state hair is now WILD: hero_sad regenerated as an edit of the braided one with a tangled mop, NO braid, snowflakes in it; hero_comb (neat
+  glossy braid) is the payoff, so the comb reveal is "wild → combed with a braid" (critic C had it at 4/10: weakest). hero_comb / hero_comb_smile were
+  kept (same pose, only the hair differs from the old sad, so they match the new base). Regenerated on the messy base: hero_dress, hero_dress_smile,
+  hero_sad_smile, hero_frozen, hero_snow (all messy, no braid). Braided originals kept in art/ref/*_braid.png. K.PICK stays 'comb'.
+- Remaining critic-C ideas NOT done (ask first): tap hint + bubbles earlier (story 3.4 s), valid-pair highlight after 3 bad swaps, endcard hero 820 px.
+
 - [ ] 6. PUBLISH — ASK THE USER FIRST: public repo `bankaino/snowbound-home-playable` + Pages from /docs
       (`python tools/build_playable.py --variant all --pages docs`). Never push study/ref or reference frames.
 

@@ -1,0 +1,26 @@
+[
+ {
+  "name": "hero_dress",
+  "prompt": "hero_dress.txt",
+  "size": "1024x1024",
+  "ref": [
+   "art/gen/hero_sad.png=edit target: change ONLY the clothes, hair stays wild and messy"
+  ]
+ },
+ {
+  "name": "hero_frozen",
+  "prompt": "hero_frozen.txt",
+  "size": "1024x1024",
+  "ref": [
+   "art/gen/hero_sad.png=edit target: only add frost rime, tiny icicles and breath"
+  ]
+ },
+ {
+  "name": "hero_sad_smile",
+  "prompt": "smile_edit.txt",
+  "size": "1024x1024",
+  "ref": [
+   "art/gen/hero_sad.png=edit target: change ONLY the facial expression to a faint relieved smile"
+  ]
+ }
+]
