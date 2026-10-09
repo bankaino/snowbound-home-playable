@@ -1,103 +1,119 @@
-# Snowbound Home — a playable ad (HTML5, single file)
+# Snowbound Home — playable ad, собранный ИИ-пайплайном
 
-A 15–25 second portrait playable ad for a home-restoration puzzle game: a young mother is thrown out into a blizzard, finds a ruined shelter,
-picks **one of three wishes** (a comb, a dress, a window) and plays a short match-3 to grant it. **Each wish changes only its own thing**
-— the comb fixes only her hair, the dress only her clothes, the window only the window — and the two unchosen wishes come back locked
-("SHE NEEDS MORE…"), which is the hook for the install tap.
+**▶ Играть в браузере / с телефона:** https://bankaino.github.io/snowbound-home-playable/
+(A/B-варианты: [long_goal](https://bankaino.github.io/snowbound-home-playable/long_goal.html) · [pick_dress](https://bankaino.github.io/snowbound-home-playable/pick_dress.html) · [pick_window](https://bankaino.github.io/snowbound-home-playable/pick_window.html) · [sad_end](https://bankaino.github.io/snowbound-home-playable/sad_end.html) · [no_story](https://bankaino.github.io/snowbound-home-playable/no_story.html) · [cta_copy](https://bankaino.github.io/snowbound-home-playable/cta_copy.html) · [auto_pick](https://bankaino.github.io/snowbound-home-playable/auto_pick.html) · [frost_fast](https://bankaino.github.io/snowbound-home-playable/frost_fast.html))
 
-Everything here is original art and code. The idea (story hook → wish choice → match-3 → payoff → endcard) comes from studying a real
-mobile-game ad; the reference frames, its characters, logo and name are **not** in this repository.
+<p align="center"><img src="docs/media/gameplay.gif" width="270" alt="геймплей"></p>
 
-**Play it (phone-sized window works best):** https://bankaino.github.io/snowbound-home-playable/ — the baseline. Variants: `long_goal.html`, `pick_dress.html`, `pick_window.html`, `sad_end.html`, `no_story.html`, `cta_copy.html`, `auto_pick.html`, `frost_fast.html` under the same address.
+Портретная playable-реклама истории-пазла в жанре «восстанови дом»: героиню выгнали на мороз, она нашла заброшенное убежище с малышом — игрок выбирает **одно из трёх желаний** (расчёска, платье, окно) и собирает для него три-в-ряд. Сделана **по мотивам рекламного креатива** (история-завязка → выбор желания → match-3 → награда) — со своим брендом, героиней, механикой и артом. Весь путь от референса до билдов под рекламные сети пройден с ИИ-инструментами: **Claude Code** (код, симуляция, агенты-критики), **Codex / ChatGPT image gen** (весь арт), собственные тулзы для сборки и проверки.
 
-* One HTML file per ad network, **1.63 MB** (Google: 1.17 MB zip). All textures are inlined as WebP; no external requests except the network's own tag.
-* Networks built from one project: AppLovin, Unity Ads, ironSource, Mintegral, Google Ads, Meta (2 MB limit) + a preview build.
-* 60 fps on a 390×844 phone viewport; 58 fps with the CPU throttled 4×.
-* Nine A/B variants from small JSON files (`variants/`), each with a written hypothesis.
+![ключевые моменты](docs/media/beats.jpg)
 
-## Flow (what the player sees)
+## Что внутри за ~16 секунд
 
-| t (demo) | beat |
-|---|---|
-| 0–1.2 s | The door slams (shake, the warm light dies), Mia is thrown out into the snow — the heroine is on screen from the first frame |
-| 1.2–2.2 s | Whip cut to the shelter: she shivers, her breath fogs, snow blows through the broken window |
-| 2.2–3.5 s | Three wishes pop in; a hand points at the comb; one tap |
-| 3.5–6.6 s | 5×6 match-3, goal 6 tiles of the chosen wish. First swap is a line blast (4–5 goal tiles), the second finishes |
-| 7–10.4 s | Reveal: swirl, flash, push-in, light only where the change happened; she lets out a faint, relieved smile; the other two wishes return locked and are tappable (→ store) |
-| 10.4 s → | Endcard: whole screen is the CTA, replay is small; the store button is visible during the whole ad |
+| время | бит | что видит игрок |
+|---|---|---|
+| 0–2.8 с | история | героиня уже лежит на снегу с первого кадра, дверь захлопывается (тряска, свет гаснет), всплывает «GET OUT!», вокруг метель |
+| 2.8–4.2 с | убежище | вспышка-склейка: Мия дрожит в рваном кресле с малышом, пар изо рта, снег из разбитого окна. Любое касание пропускает историю |
+| 4.2 с | хук | три пузыря-желания, рука указывает на расчёску, «HELP MIA! PICK ONE» |
+| 5.5–8.6 с | ядро | поле 5×6: линия из 4+ взрывает ряд (луч, тряска, стоп-кадр 60 мс), собранные плитки летят в счётчик; первая награда ≈ 7 с |
+| ~9 с | вау-момент | вихрь звёзд, вспышка, камера наезжает: **выбранное желание меняет только своё** (расчёска — растрёпанные волосы становятся аккуратной косой; платье — только одежда; окно — чинится окно, перестаёт дуть) |
+| 10–12 с | зацепка | лёгкая облегчённая улыбка; два невыбранных желания возвращаются **запертыми** — «SHE NEEDS MORE…» (на них можно нажать → стор) |
+| 12.4 с+ | эндкард | «ONE WISH GRANTED!», PLAY FREE (весь экран — CTA) |
 
-**What if nobody touches the screen?** The board never plays itself. After 6 s of no input Mia starts to **freeze**: she shivers harder, ice
-creeps in from the screen edges and over her, the caption changes to "SHE IS FREEZING! TAP!", the wind gets louder. Any touch thaws her;
-if nobody does anything for 6 more seconds, the endcard shows her frozen ("MIA IS FREEZING! Warm her up in the game!"), at ≈ 14.6 s for a
-viewer who never touched anything. A player who loses (never reaches the goal) still gets an endcard ("MIA STILL NEEDS YOU!") by ≤ 28 s;
-two bad swaps in a row bring the hint hand back.
+Принципы из практики плейаблов: история — это крючок, а не ожидание (событие с первого кадра); одно касание; награда ≤ 8 с после первого действия; нет жёсткого проигрыша (проиграл — тоже эндкард); **кнопка стора видна всё время**; на каждое действие — отклик (тряска, частицы, звук, след в мире); рука возвращается после 2.5 с простоя и после двух неверных свайпов.
 
-## How it was made (the workflow is the point of this repo)
+**Что, если зритель ничего не трогает?** Поле само не играет. Через 6 с без касаний Мия начинает **мёрзнуть**: по краям экрана растёт иней, на ней появляется иней и сосульки, подпись «SHE IS FREEZING! TAP!», ветер громче. Любое касание её отогревает; ещё 6 с тишины — эндкард «MIA IS FREEZING! Warm her up in the game!» (≈ 16.6 с для зрителя, который не трогал экран вовсе). Решение сделано «не пугать»: цвет кожи и лицо не меняются, только иней.
 
-1. **Reference → plan.** Four ad frames were read for beats, camera and economy; `study/PLAN.md` holds the plan, the decisions and what changed afterwards (the plan is the project's memory, written phase by phase).
-2. **Engine + sim.** A tiny WebGL2 engine (instanced batching, post FX) and a **deterministic 120 Hz simulation** (`live/sim.js`): every reaction is a timed state or an event, the scene only draws. The attract demo is a planner that plays the ad with the same input path as a player; `demoCheck()` asserts its beats.
-3. **Art with AI, not by hand.** Backgrounds, the heroine, tiles, door and hand were generated with Codex (image generation) from a measured style bible (`art/style_bible.txt`) and one prompt file per asset (`art/prompts/`). The three heroine variants and the window patch are **edits of one approved sprite** with "change only X", so poses and the armchair match to the pixel and the cross-fade does not shimmer. Soft edges, feathering and slicing are scripted.
-4. **Automated checks instead of eyeballing.** One command runs: syntax, demo beats, passive-viewer endcard, HUD overflow/overlap on 16 staged screens (`qa`), the build for every network, and a phone smoke test (taps the comb, swipes the best moves, taps the CTA, checks the console, external requests, fps).
-5. **Independent critics.** Two Sonnet critic passes (`study/critique/gateA.md`, `gateB.md`) scored the build against the reference and the ad rules; their top fixes were applied and measured.
-6. **Players as tests.** `tools/player_policies.js` simulates human-like players (best-move, valid-random, wasted first move, slow thinker, blind swiper, idle) and prints win time / endcard time; `tools/perf_probe.mjs` measures draw calls and frame times per phase under CPU throttling.
-
-## Measured
-
-| | |
-|---|---|
-| Build | 1.63 MB per network (textures 24.3 MB of PNG → 1.1 MB WebP at the drawn size, code + inlined display font 134 KB) |
-| Draw calls (board) | 122 → 53 idle, 173 → 104 clearing, after instancing the 30 tiles into one draw |
-| Frame rate | 60 fps at 390×844; 58 fps with the CPU throttled 4× during the heaviest phase (was 53.6) |
-| Time to first reward | 4.8 s (median valid player), 6.6 s after a wasted first move |
-| Time to win / endcard | 8.5 s median, 12 s p90, 15.6 s worst of 30 / endcard ≈ 12–19 s |
-| Idle viewer | frost starts at 8.2 s, endcard (frozen) at 14.6 s; blind swiper: endcard ≤ 28.7 s |
-| Critic scores | Gate A 5.5/10 (before the polish pass) → Gate B 7/10 |
-
-## A/B variants (`variants/*.json` → `dist/<variant>/<network>.html`)
-
-| variant | hypothesis |
-|---|---|
-| `default` | Baseline: story intro, three wishes, goal 6, hand + auto-pick on the comb, faint smile at the end, "PLAY FREE" |
-| `long_goal` | Goal 9 (≈ 5.7 moves, win ~14 s, endcard ~17 s): more invested play before the endcard lifts install intent |
-| `pick_dress` | Hand and auto-pick point at the dress (strongest contrast) instead of the comb (weakest at phone size) |
-| `pick_window` | Hand and auto-pick point at the window (clearest payoff); compare with `pick_dress` |
-| `auto_pick` | Old idle behaviour: no freezing; after 4 s the comb is auto-picked and the passive viewer sees the unplayed board (does seeing the game beat seeing Mia freeze?) |
-| `frost_fast` | Mia starts freezing after 4 s of no input and the endcard follows 5 s later: more urgency, less time to read the wishes |
-| `sad_end` | No faint smile after the fix: does unfinished need or relief drive the install tap? |
-| `no_story` | Skip the 2.2 s story, open on the three wishes: is the story worth its 2 s? |
-| `cta_copy` | "SAVE MIA" instead of "PLAY FREE" |
-
-A variant is `{ "hypothesis": "...", "K": { overrides of SIM.K }, "copy": { ... } }` — a new hypothesis is a new 5-line file and `python tools/build_playable.py --variant all`.
-
-## Build and test
+## Билды под рекламные сети — одной командой
 
 ```bash
-python tools/build_playable.py --variant all      # dist/<variant>/applovin.html, unity.html, ironsource.html, mintegral.html, google.zip, meta.html, preview.html
-PLAYWRIGHT=<path to playwright> node tools/smoke_test.mjs dist/default/applovin.html
-node tools/player_policies.js                     # simulated players
-node tools/perf_probe.mjs 4                       # draw calls / fps per phase, CPU throttle 4×
+python tools/build_playable.py --variant all
 ```
 
-Credits: display font **Lilita One** (SIL OFL 1.1, `licenses/OFL-LilitaOne.txt`), inlined in `live/font.js`; everything else is original.
+Каждый билд — **один HTML-файл** без внешних запросов: движок, код, шрифт, текстуры (WebP в base64) и адаптер сети.
 
-Needs Python 3 with Pillow, and Node with Playwright for the tests. Art generation is **not** needed to build (generated PNGs are in `art/gen`).
-The live preview page is `live/index.html?ad=1` served from the project root.
+| сеть | размер | лимит | CTA / жизненный цикл |
+|---|---|---|---|
+| AppLovin | 1.59 MB | 5 MB | MRAID `mraid.open` |
+| Unity Ads | 1.59 MB | 5 MB | MRAID |
+| ironSource | 1.59 MB | 5 MB | DAPI `openStoreUrl` |
+| Mintegral | 1.59 MB | 5 MB | `install()`, `gameReady()`, `gameEnd()` |
+| Google Ads | 1.15 MB (zip) | 5 MB | `ExitApi.exit()` |
+| Meta | 1.59 MB | 2 MB | `FbPlayableAd.onCTAClick()` |
 
-## Repository map
+Звук выключается, когда реклама не видна (MRAID `viewableChange` / DAPI `audioVolumeChange`). До первого касания браузеры не дают играть звуку, поэтому ролик читается и без него (подписи + картинка); где сеть разрешает автозвук, он включается с первого кадра. Полный отчёт: [docs/build-report.md](docs/build-report.md).
+
+## Оптимизация (было → стало)
+
+| что | до | после | как |
+|---|---|---|---|
+| текстуры | 24 MB PNG | **1.08 MB** | WebP ровно под размер на экране (`tools/build.json`) |
+| поле, 30 плиток (покой) | 122 draw calls | **53** | плитки в один instanced draw из атласа (`live/batch.js`) |
+| поле, сбор и падение | 173 draw calls | **104** | то же + лимит искр на очистку |
+| FPS при замедлении CPU в 4 раза (самый тяжёлый момент) | 53.6 | **58.2** | инстансинг; меньше снежинок под полем |
+| FPS на мобильном вьюпорте 390×844 | — | **61** | |
+| звук | — | **0 байт** | процедурный WebAudio (`live/audio.js`) |
+| шрифт | системный (на Android другой) | **один на всех**, 37 KB | Lilita One (SIL OFL) в base64 |
+
+Экран заполняется на любом телефоне: ширина вида 1080, высота следует соотношению сторон устройства (16:9 … 19.5:9), поле и эндкард подстраиваются по высоте.
+
+## A/B-гипотезы
+
+Вариант = JSON с гипотезой и переопределением параметров (`variants/*.json`), билдится той же командой. Рекомендуемый порядок запуска — по итогам критика:
+
+- `no_story` — без истории (4.2 с), сразу три желания. *Стоит ли история своих секунд до первого касания?*
+- `pick_dress` / `pick_window` — рука и автовыбор указывают на платье / окно вместо расчёски. *Какая цель даёт самую сильную награду.*
+- `cta_copy` — «SAVE MIA» вместо «PLAY FREE». *Самая дешёвая проверка.*
+- `long_goal` — цель 9 вместо 6 (≈ 5.7 хода, победа ~14 с). *Вложенная игра против завершаемости.*
+- `frost_fast` — замерзание после 4 с вместо 6. *Больше срочности для сомневающихся.*
+- `auto_pick` — контроль: нет замерзания, через 4 с сама выбирается расчёска и зритель видит неигранное поле. *«Увидеть игру» против «увидеть, как Мия мёрзнет».*
+- `sad_end` — без лёгкой улыбки в конце. *Что цепляет сильнее: облегчение или невыполненная нужда?*
+- `default` — база.
+
+## Как проверяется качество
+
+- **Smoke-тест** (`tools/smoke_test.mjs`): открывает собранный HTML в мобильном вьюпорте с заглушкой MRAID, дожидается выбора, тапает расчёску, свайпает лучшие ходы, тапает CTA; проверяет — нет ошибок, нет внешних запросов, плитки собираются, CTA вызывает `mraid.open`, FPS ≥ 50.
+- **Детерминированная симуляция** (`live/sim.js`, 120 Гц): всё — таймерные состояния и события; демо-прогон проверяется headless (`SIM.demoCheck`): все биты рекламы наступают вовремя, пассивный зритель доходит до эндкарда.
+- **Игроки-боты** (`tools/player_policies.js`): лучший ход, случайные допустимые, холостой первый ход, медленный, наугад, «тапнул и замер». Итог: все «человеческие» стили выигрывают за 8.5–13 с (30/30), эндкард ≤ 21 с; слепые свайпы — самая слабая когорта (выигрывают ~6 из 30).
+- **Профайл** (`tools/perf_probe.mjs`): draw calls и кадры по фазам при замедлении CPU.
+- **QA HUD**: 20 экранов интерфейса рендерятся с худшими строками, проверяются выход текста за панель и наложения.
+- **Независимые агенты-критики** (3 прохода): оценивали билд против референса и правил рекламы; по их замерам исправлены первый кадр, эндкард, пузыри, слои, тайминги, раскладка под высокие телефоны. Оценки выросли с 5.5 до 7 из 10. Отчёты: [study/critique/](study/critique/).
+
+## ИИ-пайплайн
+
+1. **Разбор референса** → решения: свой бренд и героиня, правило «каждое желание меняет только своё», вместо автоигры — мягкое замерзание для тех, кто не нажимает.
+2. **Арт**: style bible + промпт на каждый ассет (`art/prompts/`), генерация пачками через Codex. Все спрайты героини — **правки одного утверждённого спрайта** с условием «меняй только X» (причёска / одежда / лицо / иней), поэтому кресло и поза совпадают до пикселя, а перекрёстное затемнение не мерцает. Края, смягчение и нарезка листов — скриптами. Исходники: `art/gen/`.
+3. **Код**: симуляция, сцена, HUD, процедурный звук — Claude Code; живое превью с hot-reload.
+4. **Проверка**: smoke-тест, боты, QA, агенты-критики → правки → варианты → билды.
+
+Пайплайн упакован в переиспользуемый скилл для Claude Code: новый плейабл по референсу стартует с готового шаблона, новыми остаются только механика и арт.
+
+## Запуск локально
+
+```bash
+python -m http.server 8000      # из корня репозитория
+# http://localhost:8000/live/index.html?ad=1  — живая версия (рекламный режим)
+# http://localhost:8000/live/index.html       — авто-демо (attract), любое касание — играть
+python tools/build_playable.py --variant all --pages docs   # билды + демо для GitHub Pages
+PLAYWRIGHT=<путь к playwright> node tools/smoke_test.mjs dist/default/applovin.html   # нужен Playwright
+node tools/player_policies.js   # боты-игроки
+```
+
+## Структура
 
 ```
-live/        engine (gl.js, lib.js, batch.js), sim.js (game + demo), scene.js (drawing + HUD), audio.js (procedural sound), assets, sizes.js
-art/         style_bible.txt, prompts/ (one per asset), gen/ (generated PNGs), jobs*.json (generation batches), ref/ (edit crops)
-tools/       build_playable.py (all networks), build.json (textures, store links), smoke_test.mjs, player_policies.js, perf_probe.mjs
-variants/    A/B hypotheses
-study/       PLAN.md (decisions + phase log), critique/ (critic reports)
+live/        движок (gl.js, lib.js, batch.js), игра (sim.js, scene.js), звук, шрифт, index.html
+tools/       build_playable.py, build.json (текстуры, стор), smoke_test.mjs, player_policies.js, perf_probe.mjs
+variants/    A/B-гипотезы
+art/         style bible, промпты, сгенерированные исходники, правки-вырезки
+study/       PLAN.md (решения и журнал фаз), critique/ (отчёты агентов-критиков)
+docs/        демо для GitHub Pages, медиа, отчёт по билдам
+licenses/    лицензия шрифта (SIL OFL 1.1)
 ```
 
-## Known gaps (honest list)
+## Честно о границах
 
-* Store links in `tools/build.json` are placeholders (`com.example.snowboundhome`); no real store listing exists for this prototype.
-* Not tested on a physical device or inside a real ad-network SDK container — only a headless phone viewport with a stub MRAID container.
-* Sound is procedural (WebAudio) and was not listened to on a device; a licensed/recorded soundtrack would be next.
-* A viewer who does nothing never sees the payoff (by design the board never plays itself); `auto_pick` is the testable alternative, an auto-played first move is another candidate.
-* The faint smile and the heroine's face stay sad in the reveal on purpose (the "only its own thing" rule); an emotional close-up on the endcard is in `default`, off in `sad_end`.
-* Hand-made game-feel is code, not authored animation: Mia is one pose per variant cross-faded, not a rig.
+Ссылки на стор — заглушки (`com.example.snowboundhome`); билды проверены в headless-браузере с заглушкой MRAID, **не** на физическом устройстве и не внутри настоящего SDK сети; звук процедурный и на устройстве не прослушан. Героиня остаётся грустной после исправления — по замыслу (лёгкая улыбка только в самом конце); оценка критика «лучше референса» относилась к четырём его кадрам, а не к полному ролику.
+
+*Референс — чужой рекламный креатив, в репозиторий не включён. Название, бренд, героиня и весь арт — свои; шрифт Lilita One — SIL Open Font License.*
