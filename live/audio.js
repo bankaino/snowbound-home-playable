@@ -36,7 +36,7 @@
     shuffle: (t0) => burst(t0, 0.3, 600, 3000, 0.15, 1),
     win: (t0) => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, t0 + i * 0.08, 0.3, 'triangle', 0.14)),
     reveal: (t0) => { [784, 988, 1175, 1568, 1976, 2349].forEach((f, i) => tone(f, t0 + i * 0.09, 0.4, 'sine', 0.09));        // magic swirl
-      [1318, 1568, 1318, 1760].forEach((f, i) => tone(f, t0 + 0.9 + i * 0.1, 0.12, 'triangle', 0.08, 1.15)); },                // the baby giggles
+      [1568, 2093].forEach((f, i) => tone(f, t0 + 0.75 + i * 0.12, 0.35, 'triangle', 0.08)); },                                // ta-da
     end: (t0) => [523, 784].forEach((f, i) => tone(f, t0 + i * 0.12, 0.35, 'triangle', 0.08)),
   };
   window.AUDIO = {
@@ -46,7 +46,7 @@
       if (S.t < last) last = -1;                                           // restart / replay
       for (const e of S.ev) { if (e.t <= last) continue; if (SFX[e.k]) SFX[e.k](now, e); }
       last = S.t;
-      const cold = S.end < 0 && S.phase !== 'reveal' ? 1 : S.phase === 'reveal' ? Math.max(0, 1 - (S.t - S.phaseT) / 1.2) : 0;   // wind dies when the room warms up
+      const cold = S.end < 0 && S.phase !== 'reveal' ? 1 : S.phase === 'reveal' ? (S.choice === 'window' ? Math.max(0, 1 - (S.t - S.phaseT) / 1.2) : 1) : 0;   // wind dies when the room warms up
       wind.g.gain.setTargetAtTime(0.06 * cold * (0.7 + 0.3 * Math.sin(S.t * 0.9)), now, 0.2); wind.f.frequency.setTargetAtTime(420 + 260 * Math.sin(S.t * 0.7), now, 0.3);
     },
   };

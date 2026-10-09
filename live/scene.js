@@ -23,7 +23,8 @@
   const spr = (n, cx, cy, w, h, o = {}) => { if (!has(n)) return; const s = o.s === undefined ? 1 : o.s, sx = (o.sx || 1) * s, sy = (o.sy || 1) * s; if (s <= 0.01) return;
     const tw = G.tex(n).w, th = G.tex(n).h; if (w && h) { const f = Math.min(w / tw, h / th); w = tw * f; h = th * f; }      // both given = fit inside the box, aspect kept
     if (!w) w = L.hsz(n, h); if (!h) h = w * th / tw; L.sprite(n, cx - w * sx / 2, cy - h * sy / 2, { w: w * sx, h: h * sy, u: { alpha: o.a === undefined ? 1 : o.a } }); };
-  const hero = (n, cx, bottom, a = 1) => { if (!has(n) || a <= 0.003) return; const h = Z[n][1] || L.sz(n, Z[n][0] / G.tex(n).w)[1], w = Z[n][0] || L.hsz(n, h); const [x1, y1, w1, h1] = zr(cx - w / 2 + OX, bottom - h + OY, w, h); L.sprite(n, x1, y1, { w: w1, h: h1, u: { alpha: a } }); };
+  // all room heroes share one scale (same canvas), so the cross-fade does not jump
+  const hero = (n, cx, bottom, a = 1) => { if (!has(n) || a <= 0.003) return; const ks = Z[n][1] ? Z.hero_sad[1] / G.tex('hero_sad').h : 0, h = ks ? G.tex(n).h * ks : L.sz(n, Z[n][0] / G.tex(n).w)[1], w = ks ? G.tex(n).w * ks : Z[n][0]; const [x1, y1, w1, h1] = zr(cx - w / 2 + OX, bottom - h + OY, w, h); L.sprite(n, x1, y1, { w: w1, h: h1, u: { alpha: a } }); };
   const panel = (slot, x, y, w, h, c0, c1, a = 0.85) => { L.rrect(x, y, w, h, Math.min(h / 2, 40), c0, c1, a); L.uiBox(slot, x, y, w, h, 4); };
   const bubble = (x, y, r, a, hot = 1, tail = null) => { L.glow(x, y, r * 1.55, [1, 0.95, 0.5], 0.35 * a * hot, 2.2);
     L.shadow(x + 5, y + 12, r * 1.08, r * 1.0, 0.32 * a);
@@ -31,7 +32,7 @@
       L.solid(tx - ts * 0.6, ty - ts * 0.6, ts * 1.2, ts * 1.2, [1, 0.8, 0.25], an + Math.PI / 4, ts * 0.6, ts * 0.6, a); L.solid(tx - ts / 2, ty - ts / 2, ts, ts, [1, 1, 1], an + Math.PI / 4, ts / 2, ts / 2, a); }
     L.rrect(x - r - 5, y - r - 5, 2 * r + 10, 2 * r + 10, r + 5, [1, 0.86, 0.32], [0.9, 0.6, 0.12], a);                     // golden rim
     L.rrect(x - r, y - r, 2 * r, 2 * r, r, [1, 1, 1], [0.86, 0.9, 1], a); };
-  const lock = (x, y, a) => { L.rrect(x - 15, y - 34, 30, 44, 14, [0.82, 0.84, 0.92], [0.66, 0.68, 0.8], a); L.rrect(x - 26, y - 6, 52, 42, 10, [0.98, 0.8, 0.25], [0.85, 0.6, 0.12], a); L.solid(x - 4, y + 8, 8, 14, [0.3, 0.2, 0.05], 0, 0, 0, a); };
+  const lock = (x, y, a, k = 1) => { L.rrect(x - 15 * k, y - 34 * k, 30 * k, 44 * k, 14 * k, [0.82, 0.84, 0.92], [0.66, 0.68, 0.8], a); L.rrect(x - 26 * k, y - 6 * k, 52 * k, 42 * k, 10 * k, [0.98, 0.8, 0.25], [0.85, 0.6, 0.12], a); L.solid(x - 4 * k, y + 8 * k, 8 * k, 14 * k, [0.3, 0.2, 0.05], 0, 0, 0, a); };
   const handAt = (hx, hy, down) => { if (down) L.glow(hx, hy, 70, [1, 1, 1], 0.35, 2.5);
     if (has('hand')) { const hh = Z.hand[1] * (down ? 0.92 : 1), hw = L.hsz('hand', hh); L.sprite('hand', hx - hw * 0.218, hy - hh * 0.004, { w: hw, h: hh }); }
     else { L.rrect(hx - 34, hy - 34, 68, 68, 34, [1, 1, 1], [0.86, 0.86, 0.9], 0.9); L.ring(hx, hy, 52, 52, [1, 1, 1], down ? 0.8 : 0.3, 0.12); } };
@@ -44,6 +45,7 @@
   S.render = (t) => {
     const ST = S.state || SIM.at(t), GT = ST.t, rnd = L.rnd, bd = ST.bd, ph = ST.phase, ended = ST.end >= 0;
     const shelter = ST.cut >= 0 && GT >= ST.cut, reveal = ph === 'reveal', rt = reveal ? GT - ST.phaseT : 0, warm = reveal ? SS(0, 1.5, rt) : 0, choice = ST.choice || 'comb';
+    const win = choice === 'window', wg = warm * (win ? 0.5 : 0.08), snowOn = reveal && win ? 1 - SS(0, 1, rt) : 1;   // a repaired window stops the draft + snow; the other wishes leave the room cold
     const bq = bd && ph === 'board' ? ease(clamp((GT - ST.phaseT) / K.BOARD_IN, 0, 1)) : bd && reveal ? 1 - ease(clamp((rt - 0.05) / 0.35, 0, 1)) : 0, heroA = ended ? 0 : 1 - bq;   // board covers the room → the hero steps back
     ZF = reveal ? 1 + 0.07 * SS(0, 1.4, rt) : 1;
     // ---- trauma shake from recent events ----
@@ -65,22 +67,22 @@
         L.solid(x, rnd(i, 7) * H, 140 * (0.5 + rnd(i, 6)), 3, [1, 1, 1], -0.12, 0, 0, 0.3); }       // blizzard streaks
     } else {                                                                     // shot B: the shelter
       cover('bg_room');
-      const sad = reveal && choice !== 'window' ? 1 - SS(0.5, 1.1, rt) : 1, cx = HERO[0] + (reveal ? 0 : 3 * Math.sin(GT * 38)), bot = HERO[1];
+      const sad = reveal && choice !== 'window' ? 1 - SS(0.5, 1.1, rt) : 1, cx = HERO[0] + (reveal && win ? 0 : 3 * Math.sin(GT * 38)), bot = HERO[1];
       L.shadow(cx + OX, bot - 10 + OY, 340, 48, 0.55 * heroA);                   // contact shadow: the chair stands on the floor
       hero('hero_sad', cx, bot, sad * heroA);
-      if (reveal && choice === 'comb') hero('hero_happy', cx, bot, SS(0.5, 1.1, rt) * heroA);
+      if (reveal && choice === 'comb') hero('hero_comb', cx, bot, SS(0.5, 1.1, rt) * heroA);
       if (reveal && choice === 'dress') hero('hero_dress', cx, bot, SS(0.5, 1.1, rt) * heroA);
       if (reveal && choice === 'window' && has('window_patch')) { const [px0, py0] = imgPt('bg_room', Z.patchRect[0], Z.patchRect[1]), [px1, py1] = imgPt('bg_room', Z.patchRect[2], Z.patchRect[3]);
         const [x1, y1, w1, h1] = zr(px0 + OX, py0 + OY, px1 - px0, py1 - py0); L.sprite('window_patch', x1, y1, { w: w1, h: h1, u: { alpha: SS(0.5, 1.1, rt) } }); }
-      if (!reveal) for (let j = 0; j < 3; j++) { const q = (GT * 0.9 + j / 3) % 1; L.puff(cx - 20 + 25 * q, bot - 655 - 90 * q, 14 + 28 * q, [1, 1, 1], 0.4 * (1 - q), j + 60); }   // breath puffs [ART: at her mouth]
-      if (!reveal || rt < 1) for (let j = 0; j < 14; j++) { const WIN = imgPt('bg_room', Z.winAt[0], Z.winAt[1]), y = WIN[1] + 60 + (GT * 95 * (0.5 + rnd(j, 5)) + rnd(j, 6) * 600) % 640; L.puff(WIN[0] + (rnd(j, 4) - 0.5) * 280 + 30 * Math.sin(GT + j), y, 7 + 5 * rnd(j, 3), [1, 1, 1], 0.5 * (1 - warm), j + 80); }   // snow through the window
+      if (!(reveal && win)) for (let j = 0; j < 3; j++) { const q = (GT * 0.9 + j / 3) % 1; L.puff(cx - 20 + 25 * q, bot - 655 - 90 * q, 14 + 28 * q, [1, 1, 1], 0.4 * (1 - q), j + 60); }   // breath puffs [ART: at her mouth]
+      if (snowOn > 0.01) for (let j = 0; j < 14; j++) { const WIN = imgPt('bg_room', Z.winAt[0], Z.winAt[1]), y = WIN[1] + 60 + (GT * 95 * (0.5 + rnd(j, 5)) + rnd(j, 6) * 600) % 640; L.puff(WIN[0] + (rnd(j, 4) - 0.5) * 280 + 30 * Math.sin(GT + j), y, 7 + 5 * rnd(j, 3), [1, 1, 1], 0.5 * snowOn, j + 80); }   // snow through the window
     }
     for (let i = 0; i < 36; i++) { const drift = shelter ? 40 : 160, x = (rnd(i, 1) * W + drift * Math.sin(GT * 0.8 + i) + (shelter ? 0 : GT * 160 * rnd(i, 2))) % W, y = (GT * 130 * (0.5 + rnd(i, 2)) + rnd(i, 3) * H) % H;
-      L.puff(x, y, 6 + 6 * rnd(i, 4), [1, 1, 1], 0.5 * (1 - 0.9 * warm), i); }
-    L.solid(0, 0, W, H, [0.05, 0.1, 0.3], 0, 0, 0, 0.16 * (1 - warm));          // cold grade → warm grade on the reveal
-    L.solid(0, 0, W, H, [1.0, 0.65, 0.25], 0, 0, 0, 0.16 * warm);
+      L.puff(x, y, 6 + 6 * rnd(i, 4), [1, 1, 1], 0.5 * (1 - 0.9 * (1 - snowOn)), i); }
+    L.solid(0, 0, W, H, [0.05, 0.1, 0.3], 0, 0, 0, 0.16 * (1 - wg));          // the room stays cold; only a repaired window warms it a little
+    L.solid(0, 0, W, H, [1.0, 0.65, 0.25], 0, 0, 0, 0.16 * wg);
     if (ST.cut >= 0 && GT - ST.cut < 0.3) L.solid(0, 0, W, H, [1, 1, 1], 0, 0, 0, 0.95 * (1 - (GT - ST.cut) / 0.3));   // whip flash on the cut
-    if (reveal) { L.glow(W / 2, H * 0.55, 760, [1, 0.75, 0.4], 0.32 * warm, 2.2); const wp = imgPt('bg_room', Z.winAt[0], Z.winAt[1]); L.glow(wp[0], wp[1], 640, [1, 0.8, 0.45], 0.4 * warm, 2.2);
+    if (reveal) { const wp = imgPt('bg_room', Z.winAt[0], Z.winAt[1]); if (win) L.glow(wp[0], wp[1], 700, [1, 0.8, 0.45], 0.5 * warm, 2.2); else L.glow(HERO[0], choice === 'comb' ? HERO[1] - 640 : HERO[1] - 400, 520, [1, 0.8, 0.5], 0.35 * Math.sin(Math.PI * Math.min(1, rt / 2.4)), 2.2);   // light only where the change happened
       if (rt > 0.35 && rt < 0.65) L.solid(0, 0, W, H, [1, 0.97, 0.85], 0, 0, 0, 0.55 * (1 - Math.abs(rt - 0.5) / 0.15)); }       // bloom flash as the swirl closes, warm light pours in
     L.beginComp();
 
@@ -140,12 +142,13 @@
 
     // ===== reveal FX: magic swirl round her, then the unused wishes come back locked =====
     if (reveal && !ended) {
-      if (rt < 1.6) { const q = rt / 1.6, cx = HERO[0], cy = H * 0.55, r = 70 + 400 * (1 - ease(q)), am = Math.sin(Math.PI * Math.min(1, q * 1.1));
+      const sp = win ? imgPt('bg_room', Z.winAt[0], Z.winAt[1]) : [HERO[0], choice === 'comb' ? HERO[1] - 640 : HERO[1] - 400], R0 = win ? 300 : 330;      // magic swirl closes on the thing she wished for
+      if (rt < 1.6) { const q = rt / 1.6, cx = sp[0], cy = sp[1], r = 60 + R0 * (1 - ease(q)), am = Math.sin(Math.PI * Math.min(1, q * 1.1));
         for (let j = 0; j < 18; j++) { const an = j / 18 * 6.283 + rt * 5; L.star(cx + Math.cos(an) * r, cy + Math.sin(an) * r * 0.8, 30, [1, 0.92, 0.55], am); }
         L.ring(cx, cy, r, r * 0.8, [1, 0.85, 0.5], 0.5 * am, 0.06); }
-      for (let j = 0; j < 9; j++) { const q = (rt * 0.45 + j / 9) % 1; L.star(HERO[0] + (rnd(j, 2) - 0.5) * 320 + 24 * Math.sin(rt * 3 + j), HERO[1] - 430 - 460 * q, 26, [1, 0.62, 0.72], Math.sin(Math.PI * q) * warm); }   // warmth rising off the baby
+      for (let j = 0; j < 9; j++) { const q = (rt * 0.45 + j / 9) % 1; L.star(sp[0] + (rnd(j, 2) - 0.5) * 300 + 24 * Math.sin(rt * 3 + j), sp[1] + 100 - 360 * q, 26, [1, 0.85, 0.5], Math.sin(Math.PI * q) * warm); }   // sparkles drifting up from it
       if (rt > 1.4) UI.ORDER.filter((n) => n !== choice).forEach((n, i) => { const b = UI.bubbles[n], k = popk((rt - 1.4 - 0.12 * i) / 0.3) * 0.85, y = b.y + 7 * Math.sin(GT * 3 + i), a = 0.95;
-        if (k <= 0.01) return; bubble(b.x, y, b.r * k, a, 0.25); spr(GOALTEX[n], b.x, y, Z.icon[0] * k, Z.icon[1] * k, { a: 0.4 }); lock(b.x + b.r * k * 0.55, y + b.r * k * 0.5, 1); });
+        if (k <= 0.01) return; bubble(b.x, y, b.r * k, a, 0.25); spr(GOALTEX[n], b.x, y, Z.icon[0] * k, Z.icon[1] * k, { a: 0.4 }); lock(b.x + b.r * k * 0.55, y + b.r * k * 0.5, 1, k / 0.85); });
     }
 
     // ===== captions + callouts =====
@@ -153,7 +156,7 @@
       if (ph === 'intro') caption('cap1', shelter ? '...SHE FOUND A SHELTER' : 'KICKED OUT IN THE COLD!', 250, SS(0, 0.25, GT));
       if (ph === 'choice') caption('cap2', 'HELP MIA! PICK ONE', 250, SS(0, 0.25, GT - ST.phaseT));
       if (ph === 'board' && ST.got === 0 && bd && bd.busy === 'idle') caption('cap3', 'SWIPE TO MATCH 3', 250);
-      if (reveal && rt > 1.0 && rt < 1.9) caption('capw', 'MIA FEELS WARM AGAIN!', 190, SS(1.0, 1.25, rt));
+      if (reveal && rt > 1.0 && rt < 1.9) caption('capw', choice === 'comb' ? 'LOOKING NEAT AGAIN!' : choice === 'dress' ? 'A WARM NEW DRESS!' : 'NO MORE DRAFT!', 190, SS(1.0, 1.25, rt));
       if (reveal && rt >= 1.9) caption('capn', 'SHE NEEDS MORE...', 190, SS(1.9, 2.15, rt));
     }
     for (const e of ST.ev) { const a = GT - e.t; if (a < 0 || a > 1.1 || ended) continue; const q = a / 1.1;
@@ -171,16 +174,16 @@
 
     // ===================== endcard =====================
     if (ended) { const oy = (H - 1920) / 2, a = GT - ST.end, k = SS(0, 0.45, a), win = ST.endWhy === 'win', pop = (d) => popk((a - d) / 0.35);
-      if (win) L.solid(0, 0, W, H, [0.14, 0.08, 0.04], 0, 0, 0, 0.42 * k); else L.solid(0, 0, W, H, [0.03, 0.05, 0.12], 0, 0, 0, 0.7 * k);       // warm payoff stays warm; the world's hero is hidden (no ghost)
+      if (win) L.solid(0, 0, W, H, [0.04, 0.06, 0.13], 0, 0, 0, 0.55 * k); else L.solid(0, 0, W, H, [0.03, 0.05, 0.12], 0, 0, 0, 0.7 * k);       // warm payoff stays warm; the world's hero is hidden (no ghost)
       const si = pop(0.1); if (si > 0.01) { const ix = W / 2, iy = 175 + oy, r = 82 * si;                                                         // code-drawn app icon
         L.shadow(ix, iy + 14, r * 1.1, r, 0.4); L.rrect(ix - r, iy - r, 2 * r, 2 * r, r * 0.36, [0.55, 0.78, 1], [0.2, 0.38, 0.85]);
         L.solid(ix - r * 0.42, iy - r * 0.05, r * 0.84, r * 0.62, [1, 0.97, 0.9], 0, 0, 0); L.solid(ix - r * 0.43, iy - r * 0.5, r * 0.62, r * 0.62, [0.95, 0.5, 0.25], Math.PI / 4, r * 0.31, r * 0.31);
         L.solid(ix - r * 0.1, iy + r * 0.18, r * 0.2, r * 0.38, [0.6, 0.38, 0.2], 0, 0, 0); L.star(ix + r * 0.55, iy - r * 0.55, r * 0.3, [1, 1, 1], 0.9); }
-      const s1 = pop(0.2); if (s1 > 0.01) { L.label('head', win ? "SHE'S SMILING AGAIN!" : 'MIA STILL NEEDS YOU!', W / 2, 330 + oy, { size: Math.round(72 * s1), font: FONT, col: '#ffffff', out: '#12305a', al: 0.5 });
+      const s1 = pop(0.2); if (s1 > 0.01) { L.label('head', win ? 'ONE WISH GRANTED!' : 'MIA STILL NEEDS YOU!', W / 2, 330 + oy, { size: Math.round(72 * s1), font: FONT, col: '#ffffff', out: '#12305a', al: 0.5 });
         L.label('logo', 'SNOWBOUND HOME', W / 2, 430 + oy, { size: Math.round(80 * s1), font: FONT, col: '#ffe066', out: '#3a2300', al: 0.5 });
-        L.label('tag', 'Rebuild her home!', W / 2, 515 + oy, { size: 54, font: FONT, col: '#ffffff', out: '#12305a', al: 0.5, a: k }); }
-      const sm = pop(0.35); if (sm > 0.01) { const n = win ? (choice === 'dress' ? 'hero_dress' : 'hero_happy') : 'hero_sad';
-        L.glow(W / 2, 860 + oy, 360, [1, 0.85, 0.4], win ? 0.3 : 0.12, 2.2); L.shadow(W / 2, 1115 + oy, 300 * sm, 40 * sm, 0.5); spr(n, W / 2, 850 + oy, 0, 530 * sm * (1 + 0.012 * Math.sin(t * 2.2)));
+        L.label('tag', win ? 'Help Mia fix everything!' : 'Rebuild her home!', W / 2, 515 + oy, { size: 54, font: FONT, col: '#ffffff', out: '#12305a', al: 0.5, a: k }); }
+      const sm = pop(0.35); if (sm > 0.01) { const n = win ? (choice === 'dress' ? 'hero_dress' : choice === 'comb' ? 'hero_comb' : 'hero_sad') : 'hero_sad';
+        L.glow(W / 2, 860 + oy, 360, [1, 0.85, 0.4], win ? 0.22 : 0.1, 2.2); L.shadow(W / 2, 1115 + oy, 300 * sm, 40 * sm, 0.5); spr(n, W / 2, 850 + oy, 0, 530 * sm * (1 + 0.012 * Math.sin(t * 2.2)));
         if (win) for (let j = 0; j < 8; j++) { const q = (t * 0.6 + j / 8) % 1; L.star(W / 2 + (rnd(j, 1) - 0.5) * 520, 1050 + oy - 480 * q, 22, [1, 0.92, 0.55], Math.sin(Math.PI * q) * k); } }
       const s2 = pop(0.45); if (s2 > 0.01) { const st = win ? '6/6 ✓' : ST.got + '/' + K.GOAL, tw = L.labelW('stat', st, { size: 54, font: FONT }) + 70;
         L.rrect(W / 2 - tw / 2, 1170 + oy - 46, tw, 92, 46, [0.12, 0.2, 0.1], [0.06, 0.12, 0.05], 0.8 * s2); L.uiBox('statp', W / 2 - tw / 2, 1170 + oy - 46, tw, 92, 4);

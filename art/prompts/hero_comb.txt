@@ -1,0 +1,4 @@
+Use case: payoff sprite after the player picked the COMB: the same character with ONLY her hair fixed (transparent canvas, drawn over the same background).
+Edit of Image 2: keep EVERYTHING pixel-identical: the same armchair with the same tears and the same snow on it, the same pose, canvas placement, scale, face and SAD worried expression, cold pink cheeks, mustard knit sweater, rolled jeans, bare feet, the baby and the pale-blue blanket, the shading. Change ONLY her hair: it is now neatly combed, smooth and glossy, one tidy braid over the shoulder with a soft highlight, no loose strands, no tangles, hair on the head perfectly smooth. Nothing else changes: she still looks sad and cold.
+Composition: identical to Image 2 (same canvas placement, same scale).
+Constraints: one character group only, no background, no ground, no shadow, no text.

@@ -1,0 +1,4 @@
+[
+ {"name": "hero_comb", "prompt": "hero_comb.txt", "size": "1024x1024", "ref": ["art/gen/hero_sad.png=edit target: change ONLY the hair, everything else identical"]},
+ {"name": "hero_dress", "prompt": "hero_dress.txt", "size": "1024x1024", "ref": ["art/gen/hero_sad.png=edit target: change ONLY the clothes, everything else identical"]}
+]

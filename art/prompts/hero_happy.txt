@@ -1,4 +1,0 @@
-Use case: payoff sprite of the same character after she is warm and happy (transparent canvas, drawn over the same background).
-Edit of Image 2: keep EXACTLY the same armchair, pose, framing, canvas placement, size, clothes, jeans, bare feet, baby blanket and shading; change ONLY the expression and hair: Mia now smiles warmly with bright happy eyes looking at the baby, rosy healthy cheeks, her auburn hair is neatly combed and glossy in one smooth tidy braid over the shoulder with a soft highlight and no loose strands; the baby is awake and smiling with open eyes; remove the snow dusting from the armchair and from her hair (the armchair stays torn but dry).
-Composition: identical to Image 2 (same canvas placement, same scale).
-Constraints: one character group only, no background, no ground, no shadow, no text.

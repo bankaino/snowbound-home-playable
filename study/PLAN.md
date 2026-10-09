@@ -41,13 +41,16 @@ BOARD (like 4_match3, room dimmed + blurred-ish via dark overlay behind it):
   the 2nd finishes. Refill = seeded RNG with K.GOAL_BIAS
   (0.30) toward goal tiles; if no move exists → reshuffle (deterministic). `bestMove(S)` (most goal tiles, then most
   tiles) drives: the idle hand (idle > 2.5 s → ghost-swipe of bestMove), scriptInput (demo) and the smoke test.
-REVEAL (wow, ~2.8 s): board drops out, room comes back to full brightness, magic swirl (sparkle ring in code) around
-  the target, then the payoff by choice: COMB → hero_sad cross-fades to hero_happy (neat braid, smiling, baby smiling);
-  WINDOW → window_patch overlay fades onto the window (boards + warm curtain) + indoor snowfall stops; DRESS → hero_dress.
-  In all cases: colour grade goes cold-blue → warm-amber over 1.5 s (tint uniform), warm light glow (code), shivering
-  stops, baby giggle (bright arpeggio). Then the two unused bubbles return small, grey, with a padlock: "SHE NEEDS MORE".
-ENDCARD: headline by endWhy — win "SHE'S SMILING AGAIN!", time/idle "MIA STILL NEEDS YOU!"; subline "Rebuild her home
-  in SNOWBOUND HOME"; mascot = hero_happy (or hero_dress if chosen); stat "6/6 ✓"; whole screen = CTA "PLAY FREE";
+REVEAL (~2.8 s) — EACH CHOICE CHANGES ONLY ITS OWN THING (user decision 2026-10-09, after Gate A):
+  COMB  → only her HAIR becomes neat (hero_comb = edit of hero_sad, hair only). Face still sad, sweater, snow, window: unchanged.
+  DRESS → only her CLOTHES become the pink dress (hero_dress, clothes only). Hair stays messy, window stays broken.
+  WINDOW → only the WINDOW is repaired (window_patch over bg_room): draft + snow through the window stop, she stops shivering,
+           a little warmth in the grade. Her hair/clothes stay as they were.
+  Common: board drops out, magic swirl of stars closes on the changed spot, bloom flash, push-in 1.07, local glow where the change
+  happened (NO global warm grade), cross-fade 0.6 s, caption by choice ("LOOKING NEAT AGAIN!" / "A WARM NEW DRESS!" / "NO MORE
+  DRAFT!"), then the two other wishes return LOCKED (padlock) with "SHE NEEDS MORE..." — they are the unfixed things.
+ENDCARD: headline by endWhy — win "ONE WISH GRANTED!" + "Help Mia fix everything!", time/idle "MIA STILL NEEDS YOU!"; mascot = the
+  hero of the chosen wish (hero_comb / hero_dress / hero_sad for the window); stat "6/6 ✓"; whole screen = CTA "PLAY FREE";
   small replay. No hard fail anywhere; END_MAX 28 s → endWhy 'time'.
 HUD (lay out from H, never 1920): logo text top-left small; goal panel top-centre (BOARD only); persistent CTA bar
   bottom (≈110 px) the whole time incl. INTRO; tutorial hand + line from the template.
@@ -163,6 +166,13 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
       sizes; fps; critic scores; known gaps). Commit.
 - [ ] 6. PUBLISH — ASK THE USER FIRST: public repo `bankaino/snowbound-home-playable` + Pages from /docs
       (`python tools/build_playable.py --variant all --pages docs`). Never push study/ref or reference frames.
+
+## Phase 3b (2026-10-09, user feedback: "every choice gives its own result")
+- Replaced hero_happy (changed hair+face+baby+snow) by hero_comb (hair only); hero_dress regenerated (clothes only); both are edits of
+  hero_sad with "everything else identical" (chair/pose match: no more shimmer). All room heroes share one draw scale (same canvas).
+- Removed the global warm grade; window choice stops snow/shiver/breath/wind sound; others keep them. Reveal audio: giggle → ta-da.
+- window_patch feather rebuilt from art/raw (alpha 0 within 60 px of the edge, full at 170 px) — a bright frame line used to show.
+- Variants idea for phase 5: `fix_all` (all three wishes in sequence: three short boards) vs one wish — only if the 30 s budget allows.
 
 ## Risks / notes
 - Hero edits must keep pose + framing or the cross-fade jumps: compare hero_sad vs edit at 50 % opacity on one sheet;
