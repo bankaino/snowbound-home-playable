@@ -6,7 +6,7 @@ function lcg(seed) { let a = seed >>> 0; return () => ((a = (Math.imul(a, 166452
 // policy(p, t, rnd) → null or a gesture { kind:'tap'|'swipe', x0,y0,x1,y1, dur }
 function run(policy, seed, opt = {}) {
   const p = S.spawn(0); p.rs = (p.rs + seed * 7919) | 0; const rnd = lcg(seed + 1);
-  let g = null, gEnd = 0, nextAt = opt.first || 3.0, idleAt = 0, maxT = 40;
+  let g = null, gEnd = 0, nextAt = opt.first || 4.4, idleAt = 0, maxT = 40;
   while (p.t < maxT && p.end < 0) {
     const t = p.t; let inp = { press: 0, px: 0, py: 0 };
     if (!g && t >= nextAt) { g = policy(p, t, rnd); if (g) { g.t0 = t; gEnd = t + g.dur; } else nextAt = t + 0.3; }
@@ -28,7 +28,7 @@ const policies = {
   // random swaps
   random: (name) => (p, t, r) => p.phase === 'choice' ? bubble(name)() : randomMove(p, r),
   // first move deliberately wasted (random), then best
-  badfirst: (name) => (p, t, r) => p.phase === 'choice' ? bubble(name)() : (p.moves === 0 && !p.ev.some((e) => e.k === 'bad') && p.bd.busy === 'idle' ? randomMove(p, r) : best(p)),
+  badfirst: (name) => (p, t, r) => p.phase === 'choice' ? bubble(name)() : (p.bd && p.moves === 0 && !p.ev.some((e) => e.k === 'bad') && p.bd.busy === 'idle' ? randomMove(p, r) : best(p)),
 };
 
 const validMoves = (p) => { const kd = S.kinds(p.bd.cells), out = []; for (let i = 0; i < N; i++) { const c = i % 5, r = Math.floor(i / 5); for (const j of [c < 4 ? i + 1 : -1, r < 5 ? i + 5 : -1]) { if (j < 0 || kd[i] === kd[j]) continue; const k2 = kd.slice(); [k2[i], k2[j]] = [k2[j], k2[i]]; const m = S.findMatches(k2); if (m.n) { let g = 0; for (let x = 0; x < N; x++) if (m.mark[x] && k2[x] === 3) g++; out.push([i, j, g, m.n]); } } } return out; };
