@@ -213,7 +213,9 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
   so nothing old bursts out on unlock. User decision: NO on-screen sound button. Not verifiable in headless Chromium (it never stays blocked):
   test in the networks' own preview tools. The ad must stay understandable muted (captions + visuals do that).
 
-- [ ] 6. PUBLISH — ASK THE USER FIRST: public repo `bankaino/snowbound-home-playable` + Pages from /docs
+- [x] 6. PUBLISHED 2026-10-09 (the user said "давай на GitHub закинем"): https://github.com/bankaino/snowbound-home-playable (public, main) + Pages from /docs
+      https://bankaino.github.io/snowbound-home-playable/ (default = index.html; variants <name>.html). Reference frames / ref.png / logs are gitignored, never pushed.
+      Rebuild the demo: python tools/build_playable.py --variant all --pages docs, commit, push.
       (`python tools/build_playable.py --variant all --pages docs`). Never push study/ref or reference frames.
 
 ## Phase 3b (2026-10-09, user feedback: "every choice gives its own result")
