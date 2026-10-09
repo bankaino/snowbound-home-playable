@@ -193,6 +193,12 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
   the hair tips, small icicles on the braid and chair, a cloud of breath; blue grade 0.22 → 0.07; wind boost 2.5 → 1.0. Frost frame at the
   screen edges stays. Principle: pressure must not scare — cold, cosy-sad, never horror.
 
+## Phase 5d (2026-10-09, user: "the first screen ends too fast")
+- Intro retimed: K.SLAM_AT 1.3 (door closes 1.05–1.3; "GET OUT!" pops at 0.35, fades 2.0–2.4), K.INTRO_CUT 2.8, K.INTRO_END 4.2 (was 1.2 / 2.2): the
+  story now takes 4.2 s (shot A 2.8 s, shelter 1.4 s); any tap still skips it. Demo: choose 5.5, win 8.6, reveal 9.0, end 12.4. Passive viewer:
+  chill 10.2, frozen endcard 16.6 s (END_NO_INPUT 18 so frost ends first). smoke/perf tools wait for phase 'choice' instead of fixed sleeps.
+  Trade-off: first interaction now at 4.2 s (ad rules say hook ≤ 3 s) — the `no_story` variant measures exactly this.
+
 - [ ] 6. PUBLISH — ASK THE USER FIRST: public repo `bankaino/snowbound-home-playable` + Pages from /docs
       (`python tools/build_playable.py --variant all --pages docs`). Never push study/ref or reference frames.
 

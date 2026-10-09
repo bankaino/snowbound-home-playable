@@ -14,7 +14,7 @@ const sample = async (label, ms) => p.evaluate(({ label, ms }) => new Promise((r
     if (now - t0 < ms) requestAnimationFrame(f); else res({ label, fps: +(n / ((now - t0) / 1000)).toFixed(1), worstFrameMs: +worst.toFixed(1), maxDraws: dmax, inst: G.stats.inst, phase: SCENE.state && SCENE.state.phase }); };
   requestAnimationFrame(f); }), { label, ms });
 const out = []; out.push(await sample('intro', 1500));
-await p.waitForTimeout(1200); out.push(await sample('choice', 1200));
+await p.waitForFunction(() => SCENE.state && SCENE.state.phase === 'choice', null, { timeout: 15000 }); out.push(await sample('choice', 1200));
 const comb = await p.evaluate(() => SIM.UI.bubbles.comb), box = await p.locator('canvas').boundingBox(), VIEW = await p.evaluate(() => SIM.VIEW);
 const V = (x, y) => [box.x + x / VIEW.W * box.width, box.y + y / VIEW.H * box.height];
 let [x, y] = V(comb.x, comb.y); await p.mouse.move(x, y); await p.mouse.down(); await p.waitForTimeout(80); await p.mouse.up(); await p.waitForTimeout(900);

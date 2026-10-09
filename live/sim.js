@@ -9,9 +9,9 @@
   const K = {
     COLS: 5, ROWS: 6, CELL: 170, GOAL: 6, GOAL_BIAS: 0.30, GOAL_MIN: 3,        // grid, goal count, refill bias, min goal tiles kept on the board
     SWIPE_PX: 60, SWAP_T: 0.14, CLEAR_T: 0.18, FALL_G: 5200, BOUNCE: 0.22,
-    INTRO_CUT: 1.2, INTRO_END: 2.2, AUTO_PICK: 0, BOARD_IN: 0.7, HAND_IDLE: 2.5, WIN_DELAY: 0.35, REVEAL_T: 3.4,
+    INTRO_CUT: 2.8, INTRO_END: 4.2, SLAM_AT: 1.3, AUTO_PICK: 0, BOARD_IN: 0.7, HAND_IDLE: 2.5, WIN_DELAY: 0.35, REVEAL_T: 3.4,
     PICK: 'comb', SMILE: 1, BAD_HINT: 2, STORY: 1, DEMO_PICK_AFTER: 1.3,                                         // hand + auto-pick target (A/B), faint smile in the final frames (A/B), bad swaps before the hand shows up
-    END_MAX: 22, END_NO_INPUT: 16, END_IDLE: 14,
+    END_MAX: 22, END_NO_INPUT: 18, END_IDLE: 14,
     FROST_AT: 6, FROST_T: 6, FROST_HOLD: 0.4, FROST_REC: 1.5,                    // idle for 6 s → Mia starts to freeze (frost creeps in over 6 s) → 'frozen' endcard; any touch thaws her
     DEMO_THINK: 0.55, DEMO_SWIPE: 0.4,
   };
@@ -156,7 +156,7 @@
     if (press) { S.lastIn = t; if (S.firstIn < 0) S.firstIn = t; }
     if (S.end >= 0) return S;
     if (S.phase === 'intro') {
-      if (!S.slam && t >= 0.7) { S.slam = 1; S.ev.push({ k: 'slam', t }); }       // the door shuts (scene: shake, audio: thud)
+      if (!S.slam && t >= K.SLAM_AT) { S.slam = 1; S.ev.push({ k: 'slam', t }); }       // the door shuts (scene: shake, audio: thud)
       if (S.cut < 0 && t >= K.INTRO_CUT) { S.cut = t; S.ev.push({ k: 'intro_cut', t }); }
       if (edge || t >= K.INTRO_END) toChoice(S);                                 // any tap skips the story
     } else if (S.phase === 'choice') {
@@ -200,11 +200,11 @@
   // the demo must hit every beat of the ad inside its loop
   const demoCheck = (S) => { const first = (k) => S.ev.find((e) => e.k === k), f = [];
     const ch = first('choose'), g = first('goal'), w = first('win');
-    if (!first('intro_cut')) f.push('no story cut'); if (!ch || ch.t > 4.5) f.push('choice late: ' + (ch ? ch.t.toFixed(1) : 'never'));
-    if (!g || g.t > 8) f.push('first goal late: ' + (g ? g.t.toFixed(1) : 'never'));
-    if (S.ev.filter((e) => e.k === 'goal' && e.t < 7).length < 4) f.push('< 4 goals by 7 s');
-    if (!w || w.t > 11) f.push('win late: ' + (w ? w.t.toFixed(1) : 'never'));
-    if (S.end < 0 || S.end > 15) f.push('endcard late: ' + S.end.toFixed(1)); if (S.endWhy !== 'win') f.push('endWhy ' + S.endWhy);
+    if (!first('intro_cut')) f.push('no story cut'); if (!ch || ch.t > 6.2) f.push('choice late: ' + (ch ? ch.t.toFixed(1) : 'never'));
+    if (!g || g.t > 9.5) f.push('first goal late: ' + (g ? g.t.toFixed(1) : 'never'));
+    if (S.ev.filter((e) => e.k === 'goal' && e.t < 9).length < 4) f.push('< 4 goals by 9 s');
+    if (!w || w.t > 12) f.push('win late: ' + (w ? w.t.toFixed(1) : 'never'));
+    if (S.end < 0 || S.end > 16.5) f.push('endcard late: ' + S.end.toFixed(1)); if (S.endWhy !== 'win') f.push('endWhy ' + S.endWhy);
     if (S.ev.some((e) => e.k === 'bad')) f.push('demo made a bad move'); return f; };
 
   root.SIM = { DT, L, K, VIEW, HINT, UI, START, KIND, cellXY, cellAt, findMatches, bestMove, kinds, create, spawn, respawn, outOfPlay, step, at, scriptInput, demoCheck };

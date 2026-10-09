@@ -30,7 +30,7 @@ const swipe = async (a, b) => { const [ax, ay] = await p.evaluate((i) => SIM.cel
   const [x0, y0] = V(ax, ay), [x1, y1] = V(bx, by); await p.mouse.move(x0, y0); await p.mouse.down(); await p.mouse.move(x1, y1, { steps: 8 }); await p.waitForTimeout(60); await p.mouse.up(); };
 await p.waitForTimeout(600);
 await p.evaluate(() => window.__t0 = performance.now());
-const comb = await p.evaluate(() => SIM.UI.bubbles.comb); await p.waitForTimeout(2800);          // intro is skippable, but let it play once
+const comb = await p.evaluate(() => SIM.UI.bubbles.comb); await p.waitForFunction(() => SCENE.state && SCENE.state.phase === 'choice', null, { timeout: 15000 }); await p.waitForTimeout(500);   // let the story play, then pick
 await p.screenshot({ path: path.join(shots, '1_choice.png') }); await tap(comb.x, comb.y); await p.waitForTimeout(1500);
 await p.screenshot({ path: path.join(shots, '2_board.png') });
 for (let i = 0; i < 3; i++) {                                                                      // 3 tries: first swipe, second swipe, spare

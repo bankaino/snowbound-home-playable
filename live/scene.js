@@ -44,7 +44,7 @@
     L.star(x + Math.cos(an) * d, y + Math.sin(an) * d - 30 * q, size * (1 - 0.7 * q), col, 1 - q); } };
 
   S.render = (t) => {
-    const ST = S.state || SIM.at(t), GT = ST.t, rnd = L.rnd, bd = ST.bd, ph = ST.phase, ended = ST.end >= 0;
+    const SL = K.SLAM_AT, ST = S.state || SIM.at(t), GT = ST.t, rnd = L.rnd, bd = ST.bd, ph = ST.phase, ended = ST.end >= 0;
     const shelter = ST.cut >= 0 && GT >= ST.cut, reveal = ph === 'reveal', rt = reveal ? GT - ST.phaseT : 0, warm = reveal ? SS(0, 1.5, rt) : 0, choice = ST.choice || 'comb', fz = ST.frost || 0;
     const win = choice === 'window', wg = warm * (win ? 0.5 : 0.08), snowOn = reveal && win ? 1 - SS(0, 1, rt) : 1;   // a repaired window stops the draft + snow; the other wishes leave the room cold
     const bq = bd && ph === 'board' ? ease(clamp((GT - ST.phaseT) / K.BOARD_IN, 0, 1)) : bd && reveal ? 1 - ease(clamp((rt - 0.05) / 0.35, 0, 1)) : 0, heroA = ended ? 0 : 1 - bq;   // board covers the room → the hero steps back
@@ -58,16 +58,16 @@
     L.beginBG([0.1, 0.12, 0.2, 1]);
     if (!shelter) {                                                              // shot A: the door slams, she is left in the snow
       cover('bg_outside');
-      const open = 1 - ease(clamp((GT - 0.45) / 0.25, 0, 1)), sx = 0.15 + 0.85 * (1 - open), [dl, dt] = imgPt('bg_outside', Z.doorBox[0], Z.doorBox[1]), [dr, db] = imgPt('bg_outside', Z.doorBox[2], Z.doorBox[3]), dw = (dr - dl) * 1.0, dh = db - dt;
+      const open = 1 - ease(clamp((GT - (SL - 0.25)) / 0.25, 0, 1)), sx = 0.15 + 0.85 * (1 - open), [dl, dt] = imgPt('bg_outside', Z.doorBox[0], Z.doorBox[1]), [dr, db] = imgPt('bg_outside', Z.doorBox[2], Z.doorBox[3]), dw = (dr - dl) * 1.0, dh = db - dt;
       L.glow((dl + dr) / 2 + OX, (dt + db) / 2 + OY, 700 * (0.35 + 0.65 * open), [1, 0.8, 0.4], 0.5 * open, 2.2);              // warm light that dies with the door
       L.glow((dl + dr) / 2 + OX, db + 60 + OY, 480 * open, [1, 0.75, 0.35], 0.4 * open, 2.4);
       if (has('door')) L.sprite('door', 0, 0, { m: M.of(M.t(dl + OX, db + OY), M.s(sx, 1)), w: dw, h: dh, pivot: [0, dh] });
       // she is already lying in the snow from the first frame (a sliding still image looked fake); the door slams over her, she recoils a little
-      const hxs = W * 0.40 + 1.5 * Math.sin(GT * 31) * SS(0.8, 1.2, GT), rc = clamp((GT - 0.7) / 0.35, 0, 1), hb = H * 0.80 + 9 * Math.sin(Math.PI * rc) * (1 - rc);
+      const hxs = W * 0.40 + 1.5 * Math.sin(GT * 31) * SS(SL + 0.1, SL + 0.5, GT), rc = clamp((GT - SL) / 0.35, 0, 1), hb = H * 0.80 + 9 * Math.sin(Math.PI * rc) * (1 - rc);
       L.shadow(hxs + OX, hb - 4 + OY, 400, 44, 0.42); hero('hero_snow', hxs + OX * 0.4, hb, 1);          // there from the very first frame
-      for (let j = 0; j < 7; j++) { const q = clamp((GT - 0.7 - j * 0.02) / 0.7, 0, 1); if (q > 0 && q < 1) L.puff(hxs + (j - 3) * 85 + OX, hb - 30 - 70 * q, 26 + 46 * q, [1, 1, 1], 0.5 * (1 - q), j + 100); }   // snow kicked up by the thud
-      { const sq = clamp((GT - 0.12) / 0.22, 0, 1), fade = 1 - SS(1.0, 1.5, GT);                                                   // the shout from the doorway
-        if (sq > 0 && fade > 0.01) L.label('shout', 'GET OUT!', W * 0.30 + 8 * Math.sin(GT * 55) * (GT < 0.8 ? 1 : 0) + OX, dt + 150 + OY, { size: Math.round(104 * popk(sq)), font: FONT, col: '#ffe14a', out: '#7a1500', al: 0.5, a: fade }); }
+      for (let j = 0; j < 7; j++) { const q = clamp((GT - SL - j * 0.02) / 0.7, 0, 1); if (q > 0 && q < 1) L.puff(hxs + (j - 3) * 85 + OX, hb - 30 - 70 * q, 26 + 46 * q, [1, 1, 1], 0.5 * (1 - q), j + 100); }   // snow kicked up by the thud
+      { const sq = clamp((GT - 0.35) / 0.22, 0, 1), fade = 1 - SS(SL + 0.7, SL + 1.1, GT);                                                   // the shout from the doorway
+        if (sq > 0 && fade > 0.01) L.label('shout', 'GET OUT!', W * 0.30 + 8 * Math.sin(GT * 55) * (GT < SL ? 1 : 0) + OX, dt + 150 + OY, { size: Math.round(104 * popk(sq)), font: FONT, col: '#ffe14a', out: '#7a1500', al: 0.5, a: fade }); }
       for (let i = 0; i < 16; i++) { const x = ((rnd(i, 9) * 1.5 * W - GT * 1100 * (0.6 + rnd(i, 8))) % (1.5 * W) + 1.5 * W) % (1.5 * W) - 0.2 * W;
         L.solid(x, rnd(i, 7) * H, 140 * (0.5 + rnd(i, 6)), 3, [1, 1, 1], -0.12, 0, 0, 0.3); }       // blizzard streaks
     } else {                                                                     // shot B: the shelter
@@ -169,7 +169,7 @@
 
     // ===== captions + callouts =====
     if (!ended) {
-      if (ph === 'intro') caption('cap1', shelter ? '...SHE FOUND A SHELTER' : 'KICKED OUT IN THE COLD!', 250, SS(0, 0.25, GT));
+      if (ph === 'intro') caption('cap1', shelter ? '...SHE FOUND A SHELTER' : 'KICKED OUT IN THE COLD!', 250, shelter ? SS(0, 0.25, GT - ST.cut) : SS(0.3, 0.6, GT));
       if (ph === 'choice') caption('cap2', fz > 0.04 ? 'SHE IS FREEZING! TAP!' : 'HELP MIA! PICK ONE', 250, SS(0, 0.25, GT - ST.phaseT));
       if (ph === 'board' && fz > 0.04) caption('cap3', 'HURRY! SHE IS FREEZING!', 250);
       else if (ph === 'board' && ST.got === 0 && bd && bd.busy === 'idle') caption('cap3', 'SWIPE TO MATCH 3', 250);
@@ -219,7 +219,9 @@
   // QA hooks: every HUD screen staged from the attract replay where it happens naturally
   S.QA = () => {
     const at = (tt, o = {}) => Object.assign(JSON.parse(JSON.stringify(SIM.at(tt))), o);
-    return { states: [['intro_a', at(0.9)], ['intro_b', at(1.8)], ['choice', at(3.2)], ['board', at(4.5)], ['swipe', at(5.0)], ['match', at(5.3)], ['reveal_a', at(7.4)],
-      ['reveal_b', at(8.9)], ['reveal_window', at(8.4, { choice: 'window' })], ['reveal_dress', at(8.4, { choice: 'dress' })], ['board_dress', at(5.3, { choice: 'dress' })], ['reveal_smile', at(9.8)], ['frost_half', at(3.4, { frost: 0.55 })], ['frost_board', at(5.0, { frost: 0.8 })], ['end_frozen', at(6.0, { end: 4.5, endWhy: 'frozen', frost: 1 })], ['end', at(11.5)], ['end_window', at(11.5, { choice: 'window' })], ['end_dress', at(11.5, { choice: 'dress' })], ['goal_worst', at(5.3, { got: 99 })]], cycles: {}, sprites: {}, box: () => [0, 0, W, H] };
+    return { states: [['intro_a', at(0.9)], ['intro_a2', at(2.2)], ['intro_b', at(3.5)], ['choice', at(5.2)], ['board', at(6.5)], ['swipe', at(7.0)], ['match', at(7.3)],
+      ['reveal_a', at(9.4)], ['reveal_b', at(10.9)], ['reveal_window', at(10.4, { choice: 'window' })], ['reveal_dress', at(10.4, { choice: 'dress' })], ['board_dress', at(7.3, { choice: 'dress' })],
+      ['reveal_smile', at(11.8)], ['frost_half', at(5.4, { frost: 0.55 })], ['frost_board', at(7.0, { frost: 0.8 })], ['end_frozen', at(8.0, { end: 6.5, endWhy: 'frozen', frost: 1 })],
+      ['end', at(13.5)], ['end_window', at(13.5, { choice: 'window' })], ['end_dress', at(13.5, { choice: 'dress' })], ['goal_worst', at(7.3, { got: 99 })]], cycles: {}, sprites: {}, box: () => [0, 0, W, H] };
   };
 })();
