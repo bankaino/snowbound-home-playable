@@ -49,7 +49,7 @@
       for (const e of S.ev) { if (e.t <= last) continue; if (SFX[e.k]) SFX[e.k](now, e); }
       last = S.t;
       const cold = S.end < 0 && S.phase !== 'reveal' ? 1 : S.phase === 'reveal' ? (S.choice === 'window' ? Math.max(0, 1 - (S.t - S.phaseT) / 1.2) : 1) : 0;   // wind dies when the room warms up
-      wind.g.gain.setTargetAtTime(0.06 * cold * (0.7 + 0.3 * Math.sin(S.t * 0.9)) * (1 + 2.5 * (S.frost || 0)), now, 0.2); wind.f.frequency.setTargetAtTime(420 + 260 * Math.sin(S.t * 0.7), now, 0.3);
+      wind.g.gain.setTargetAtTime(0.06 * cold * (0.7 + 0.3 * Math.sin(S.t * 0.9)) * (1 + 1.0 * (S.frost || 0)), now, 0.2); wind.f.frequency.setTargetAtTime(420 + 260 * Math.sin(S.t * 0.7), now, 0.3);
     },
   };
 })();

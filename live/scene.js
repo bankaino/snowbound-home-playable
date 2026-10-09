@@ -62,13 +62,17 @@
       L.glow((dl + dr) / 2 + OX, (dt + db) / 2 + OY, 700 * (0.35 + 0.65 * open), [1, 0.8, 0.4], 0.5 * open, 2.2);              // warm light that dies with the door
       L.glow((dl + dr) / 2 + OX, db + 60 + OY, 480 * open, [1, 0.75, 0.35], 0.4 * open, 2.4);
       if (has('door')) L.sprite('door', 0, 0, { m: M.of(M.t(dl + OX, db + OY), M.s(sx, 1)), w: dw, h: dh, pivot: [0, dh] });
-      const u = ease(clamp(GT / 0.9, 0, 1)), hb = db + (H * 0.80 - db) * u - 70 * Math.sin(Math.PI * u);                // she is thrown out and slides onto the snow
-      const hxs = (dl + dr) / 2 + (W * 0.40 - (dl + dr) / 2) * u; L.shadow(hxs + OX, hb - 4 + OY, 400, 44, 0.42 * SS(0, 0.15, GT)); hero('hero_snow', hxs, hb, SS(0, 0.15, GT));
+      // she is already lying in the snow from the first frame (a sliding still image looked fake); the door slams over her, she recoils a little
+      const hxs = W * 0.40 + 1.5 * Math.sin(GT * 31) * SS(0.8, 1.2, GT), rc = clamp((GT - 0.7) / 0.35, 0, 1), hb = H * 0.80 + 9 * Math.sin(Math.PI * rc) * (1 - rc);
+      L.shadow(hxs + OX, hb - 4 + OY, 400, 44, 0.42); hero('hero_snow', hxs + OX * 0.4, hb, 1);          // there from the very first frame
+      for (let j = 0; j < 7; j++) { const q = clamp((GT - 0.7 - j * 0.02) / 0.7, 0, 1); if (q > 0 && q < 1) L.puff(hxs + (j - 3) * 85 + OX, hb - 30 - 70 * q, 26 + 46 * q, [1, 1, 1], 0.5 * (1 - q), j + 100); }   // snow kicked up by the thud
+      { const sq = clamp((GT - 0.12) / 0.22, 0, 1), fade = 1 - SS(1.0, 1.5, GT);                                                   // the shout from the doorway
+        if (sq > 0 && fade > 0.01) L.label('shout', 'GET OUT!', W * 0.30 + 8 * Math.sin(GT * 55) * (GT < 0.8 ? 1 : 0) + OX, dt + 150 + OY, { size: Math.round(104 * popk(sq)), font: FONT, col: '#ffe14a', out: '#7a1500', al: 0.5, a: fade }); }
       for (let i = 0; i < 16; i++) { const x = ((rnd(i, 9) * 1.5 * W - GT * 1100 * (0.6 + rnd(i, 8))) % (1.5 * W) + 1.5 * W) % (1.5 * W) - 0.2 * W;
         L.solid(x, rnd(i, 7) * H, 140 * (0.5 + rnd(i, 6)), 3, [1, 1, 1], -0.12, 0, 0, 0.3); }       // blizzard streaks
     } else {                                                                     // shot B: the shelter
       cover('bg_room');
-      const sad = reveal && choice !== 'window' ? 1 - SS(0.5, 1.1, rt) : 1, cx = HERO[0] + (reveal && win ? 0 : (3 + 6 * fz) * Math.sin(GT * (38 + 30 * fz))), bot = HERO[1];
+      const sad = reveal && choice !== 'window' ? 1 - SS(0.5, 1.1, rt) : 1, cx = HERO[0] + (reveal && win ? 0 : 3 * Math.sin(GT * 38)), bot = HERO[1];
       L.shadow(cx + OX, bot - 10 + OY, 340, 48, 0.55 * heroA);                   // contact shadow: the chair stands on the floor
       hero('hero_sad', cx, bot, sad * heroA);
       if (fz > 0.02) hero('hero_frozen', cx, bot, SS(0.25, 1, fz) * heroA);                    // ice creeps over her while nobody touches the screen
@@ -82,7 +86,7 @@
     }
     for (let i = 0; i < (bq > 0.9 ? 10 : 36); i++) { const drift = shelter ? 40 : 160, x = (rnd(i, 1) * W + drift * Math.sin(GT * 0.8 + i) + (shelter ? 0 : GT * 160 * rnd(i, 2))) % W, y = (GT * 130 * (0.5 + rnd(i, 2)) + rnd(i, 3) * H) % H;
       L.puff(x, y, 6 + 6 * rnd(i, 4), [1, 1, 1], 0.5 * (1 - 0.9 * (1 - snowOn)), i); }
-    L.solid(0, 0, W, H, [0.05, 0.1, 0.3], 0, 0, 0, 0.16 * (1 - wg) + 0.22 * fz);          // the room stays cold; only a repaired window warms it a little
+    L.solid(0, 0, W, H, [0.05, 0.1, 0.3], 0, 0, 0, 0.16 * (1 - wg) + 0.07 * fz);          // the room stays cold; only a repaired window warms it a little
     L.solid(0, 0, W, H, [1.0, 0.65, 0.25], 0, 0, 0, 0.16 * wg);
     if (ST.cut > 0.01 && GT - ST.cut < 0.3) L.solid(0, 0, W, H, [1, 1, 1], 0, 0, 0, 0.95 * (1 - (GT - ST.cut) / 0.3));   // whip flash on the cut
     if (reveal) { const wp = imgPt('bg_room', Z.winAt[0], Z.winAt[1]); if (win) L.glow(wp[0], wp[1], 700, [1, 0.8, 0.45], 0.5 * warm, 2.2); else L.glow(HERO[0], choice === 'comb' ? HERO[1] - 640 : HERO[1] - 400, 520, [1, 0.8, 0.5], 0.35 * Math.sin(Math.PI * Math.min(1, rt / 2.4)), 2.2);   // light only where the change happened

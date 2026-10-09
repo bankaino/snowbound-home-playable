@@ -186,6 +186,13 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
   Passive viewer: chill 8.2 s, endcard 14.6 s. Variants auto_pick (old behaviour) and frost_fast (4 s / 5 s) added. 9 variants total.
 - Assets: hero_frozen (edit of hero_sad: frost only), frost_frame (transparent frost border, 640 px). Build 1.63 MB (Meta 2 MB limit ok).
 
+## Phase 5c (2026-10-09, user playtest feedback)
+- Intro shot A: the heroine no longer "flies" (a still image sliding looked fake). She lies in the snow from the very first frame; the door slams
+  over her (shake, light dies), she recoils a few px with a puff of snow, and a comic "GET OUT!" shout pops beside the doorway (0.12–1.5 s).
+- Freeze effect softened: no accelerating shake (constant shiver), no blue skin/grimace — hero_frozen regenerated as hero_sad + frost rime on
+  the hair tips, small icicles on the braid and chair, a cloud of breath; blue grade 0.22 → 0.07; wind boost 2.5 → 1.0. Frost frame at the
+  screen edges stays. Principle: pressure must not scare — cold, cosy-sad, never horror.
+
 - [ ] 6. PUBLISH — ASK THE USER FIRST: public repo `bankaino/snowbound-home-playable` + Pages from /docs
       (`python tools/build_playable.py --variant all --pages docs`). Never push study/ref or reference frames.
 

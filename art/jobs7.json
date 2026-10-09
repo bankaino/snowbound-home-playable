@@ -1,0 +1,3 @@
+[
+ {"name": "hero_frozen", "prompt": "hero_frozen.txt", "size": "1024x1024", "ref": ["art/gen/hero_sad.png=edit target: only add frost rime, tiny icicles and breath; same face and natural skin"]}
+]
