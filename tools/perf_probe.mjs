@@ -1,7 +1,7 @@
 // draw calls + frame times per phase on the packed build, phone viewport, throttled CPU 4x to imitate a mid-range device
 import { createRequire } from 'node:module'; import path from 'node:path'; import { pathToFileURL } from 'node:url';
-const req = createRequire('C:/Users/artemm/.claude/skills/ref2game/scripts/package.json');
-const { chromium } = req('playwright');
+const req = createRequire(import.meta.url);
+const { chromium } = req(process.env.PLAYWRIGHT || 'playwright');   // PLAYWRIGHT = path to the playwright package if it is not installed locally
 const file = path.resolve('dist/default/applovin.html');
 const browser = await chromium.launch({ args: ['--enable-gpu', '--ignore-gpu-blocklist'] });
 const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });

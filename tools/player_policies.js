@@ -1,5 +1,5 @@
 // headless human-ish players against SIM: how long until the goal / endcard, and does anything get stuck
-const S = require('C:/Users/artemm/Documents/azuregames/new/live/sim.js');
+const S = require('../live/sim.js');
 const U = S.UI, N = S.K.COLS * S.K.ROWS;
 function lcg(seed) { let a = seed >>> 0; return () => ((a = (Math.imul(a, 1664525) + 1013904223) >>> 0) / 4294967296); }
 

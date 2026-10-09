@@ -8,6 +8,8 @@ picks **one of three wishes** (a comb, a dress, a window) and plays a short matc
 Everything here is original art and code. The idea (story hook → wish choice → match-3 → payoff → endcard) comes from studying a real
 mobile-game ad; the reference frames, its characters, logo and name are **not** in this repository.
 
+**Play it (phone-sized window works best):** https://bankaino.github.io/snowbound-home-playable/ — the baseline. Variants: `long_goal.html`, `pick_dress.html`, `pick_window.html`, `sad_end.html`, `no_story.html`, `cta_copy.html`, `auto_pick.html`, `frost_fast.html` under the same address.
+
 * One HTML file per ad network, **1.63 MB** (Google: 1.17 MB zip). All textures are inlined as WebP; no external requests except the network's own tag.
 * Networks built from one project: AppLovin, Unity Ads, ironSource, Mintegral, Google Ads, Meta (2 MB limit) + a preview build.
 * 60 fps on a 390×844 phone viewport; 58 fps with the CPU throttled 4×.
