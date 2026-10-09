@@ -136,13 +136,23 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
       giggle, end. Not listened to on a real device.
       [ART] tuning for phase 3 (constants at the top of scene.js / sizes.js): HERO centre/bottom, WIN (window position = SIZES.patchAt),
       breath puff position (bot - 640), door left x/bottom, hero_snow slide path, Z.* display sizes, bubble positions in SIM.UI.
-- [ ] 3. ART (Gate A): art/style_bible.txt (≤ 6 lines, measured from study/ref: palette hex, outline weight, shading
-      steps, light direction, exclusions "no text, no logos, no UI frames") → one prompt per asset in art/prompts/ →
-      art/jobs.json (bg_* with "size": "1024x1536") → batch 1: bg_room, hero_sad, tiles_sheet; check ONE contact sheet
-      on grey; approve hero_sad → batch 2 (edits): hero_happy, hero_dress, hero_snow, window_patch; batch 3: bg_outside,
-      door. Slice tiles, prep, measure window position → sizes.js. Then `verify.sh` + stills
-      (`node <R>/render.mjs stills 0.6,2.0,3.2,5.5,9,11.5,13.5 --out frames/g`) → critic Gate A in background
-      (`<S>/references/critic-brief.md`, model sonnet). Apply top fixes. Commit.
+- [x] 3. DONE 2026-10-09 (Sonnet 5.5). Art via Codex (ChatGPT plan, no Claude tokens), 3 batches: bg_room, bg_outside, door,
+      hero_sad, hand, tiles_a/b_sheet (sliced into 6 tiles) → hero_happy / hero_dress (edits of hero_sad), hero_snow (design ref),
+      window_patch (edit of art/ref/window_crop.png, feathered in PIL) → hand regenerated after the critic. verify OK, 0.91 MB per
+      network (textures 16 MB → 608 KB webp), 61 fps. Style bible = art/style_bible.txt; ref.png = 2_shelter (style ref).
+      Geometry now comes from the art: SIZES.doorBox (arch opening in bg_outside), winAt + patchRect (window in bg_room), all as
+      image fractions → scene `imgPt()` (cover-fit aware, works on every phone aspect). hero_snow sized by width (900).
+      Gate A critic (study/critique/gateA.md): overall 5.5; art "at the reference's level", prototype feel = code-drawn polish.
+      FIXED from it: hero visible from t=0 (hook), endcard ghost removed (world hero hidden, warm overlay, app icon, stat pill),
+      hero fades under the board + contact shadows (chair, hero_snow), bubble tails aim at Mia + golden rim + shadow, layered
+      beam + callout above the goal panel + 2× sparks, board light-blue rim + goal panel brown rim, reveal = push-in 1.07 + bloom
+      flash + window light + rising hearts, locked bubbles bigger, captions in reveal at y=190, door width 1.0×, hand regenerated
+      (painted, no cuff; tip offset 0.218 × width), hero_snow base feathered.
+      NOT done (candidates for phase 4, in this order): (a) bg_room_warm.png = edit of bg_room (window boarded, curtain, rug,
+      lamp, no drifts) cross-faded for ALL choices — the real "transformation" wow; (b) hero_happy/hero_dress repaint the chair
+      (alpha IoU 0.97) → shimmer during the 0.6 s cross-fade; fix by compositing only head/clothes onto hero_sad in prep, or regen
+      with "chair pixel-identical"; (c) embed an OFL display font (Lilita One) — needs a download, ask the user; (d) real store
+      URLs in tools/build.json (placeholders now); (e) 60 ms hit-stop on blast (needs a sim freeze).
 - [ ] 4. FEEL (Gate B): play it on the live page (serve.sh, `?ad=1`), tune K headless; check a manual player who makes
       a bad first move still wins by ~15 s; passive endcard ≤ 12 s; fps ≥ 60 at 390×844. `verify.sh all` green →
       critic Gate B → max 2 fix rounds. Commit.

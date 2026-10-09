@@ -1,4 +1,4 @@
-Use case: tutorial pointer for a mobile game ad ("swipe here" hint), in the same soft painted style.
-Subject: a friendly cartoon hand with smooth light skin and soft shading, index finger extended pointing UP and slightly left, other fingers curled, thumb resting on the side, a short cuff of a mustard knit sleeve at the wrist. The fingertip touches the very top of the image at about 33% of the image width from the left.
-Composition: one hand, upright, filling about 90% of the canvas height, margin on the sides and bottom.
-Constraints: no text, no motion lines, no shadow, no glow, no background.
+Use case: tutorial pointer for a mobile game ad ("swipe here" hint), painted in the same polished soft-3D style as Image 1 (not a flat emoji).
+Subject: a natural, softly shaded human hand seen from the back-side, light warm skin with subtle knuckle creases and gentle shading in three steps, a short natural-pink nail, index finger extended pointing UP and slightly left, other fingers curled, thumb resting along the side. NO cuff, NO sleeve: the wrist fades out at the bottom edge of the image (cut cleanly). The fingertip touches the very top of the image at about 33% of the image width from the left.
+Composition: one hand, upright, filling the canvas height with margin on the sides; light from the upper left.
+Constraints: no text, no motion lines, no cast shadow, no glow, no background, no jewellery.
