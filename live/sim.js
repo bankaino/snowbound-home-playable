@@ -10,9 +10,9 @@
     COLS: 5, ROWS: 6, CELL: 170, GOAL: 6, GOAL_BIAS: 0.30, GOAL_MIN: 3,        // grid, goal count, refill bias, min goal tiles kept on the board
     SWIPE_PX: 60, SWAP_T: 0.14, CLEAR_T: 0.18, FALL_G: 5200, BOUNCE: 0.22,
     INTRO_CUT: 1.2, INTRO_END: 2.2, AUTO_PICK: 2.5, BOARD_IN: 0.7, HAND_IDLE: 2.5, WIN_DELAY: 0.35, REVEAL_T: 3.4,
-    PICK: 'comb', SMILE: 1, BAD_HINT: 2,                                         // hand + auto-pick target (A/B), faint smile in the final frames (A/B), bad swaps before the hand shows up
+    PICK: 'comb', SMILE: 1, BAD_HINT: 2, STORY: 1, DEMO_PICK_AFTER: 1.3,                                         // hand + auto-pick target (A/B), faint smile in the final frames (A/B), bad swaps before the hand shows up
     END_MAX: 22, END_NO_INPUT: 14, END_IDLE: 10,
-    DEMO_CHOOSE: 3.5, DEMO_THINK: 0.55, DEMO_SWIPE: 0.4,
+    DEMO_THINK: 0.55, DEMO_SWIPE: 0.4,
   };
   const N = K.COLS * K.ROWS, GOALK = 3;                                         // tile kinds: 0 leaf, 1 coin, 2 yarn, 3 GOAL (comb | window | dress)
   const KIND = { L: 0, C: 1, Y: 2, G: 3 };
@@ -62,7 +62,7 @@
     return { cells, busy: 'in', t0: S.t, readyAt: S.t + K.BOARD_IN, sw: null, casc: 0, idleSince: -9, best: null };
   }
   function create() {
-    return { t: 0, steps: 0, wt0: 0, ev: [], phase: 'intro', phaseT: 0, cut: -1, choice: '', auto: false, bd: null, got: 0, money: 0, earned: 0, moves: 0,
+    return { t: 0, steps: 0, wt0: 0, ev: K.STORY ? [] : [{ k: 'intro_cut', t: 0 }, { k: 'bubbles', t: 0 }], phase: K.STORY ? 'intro' : 'choice', phaseT: 0, cut: K.STORY ? -1 : 0, choice: '', auto: false, bd: null, got: 0, money: 0, earned: 0, moves: 0,
       end: -1, endWhy: '', winT: -9, firstIn: -1, lastIn: 0, prevPress: false, drag: null, sel: -1, rs: 20241009, nid: 0 };
   }
   const spawn = (worldT) => Object.assign(create(), { wt0: worldT });
@@ -176,7 +176,7 @@
   const scriptInput = (t, S) => {
     const inp = { press: 0, px: W / 2, py: H / 2 };
     if (S.end >= 0) return inp;
-    if (S.phase === 'choice') { const b = UI.bubbles[K.PICK]; inp.px = b.x; inp.py = b.y; if (t >= K.DEMO_CHOOSE && t < K.DEMO_CHOOSE + 0.15) inp.press = 1; }
+    if (S.phase === 'choice') { const b = UI.bubbles[K.PICK]; inp.px = b.x; inp.py = b.y; if (t >= S.phaseT + K.DEMO_PICK_AFTER && t < S.phaseT + K.DEMO_PICK_AFTER + 0.15) inp.press = 1; }
     else if (S.phase === 'board' && S.bd.busy === 'idle' && S.bd.best) {
       const u = (t - S.bd.idleSince - K.DEMO_THINK) / K.DEMO_SWIPE, [ax, ay] = cellXY(S.bd.best.a), [bx, by] = cellXY(S.bd.best.b), k = Math.max(0, Math.min(1, u));
       inp.px = ax + (bx - ax) * k; inp.py = ay + (by - ay) * k; if (u >= 0 && u <= 1.15) inp.press = 1;

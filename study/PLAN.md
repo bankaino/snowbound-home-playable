@@ -171,12 +171,12 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
       NOT done on purpose: K.ASSIST auto-solve for passive viewers (the board must not play itself — decision of the plan; ask the user);
       font embed (needs a download → ask); real store URLs (placeholders com.example.snowboundhome / id0000000000 → ask).
       New K switches for A/B: K.PICK ('comb'|'dress'|'window' = hand + auto-pick target), K.SMILE (0|1), K.GOAL (6|9), K.BAD_HINT.
-- [ ] 5. VARIANTS + delivery: rewrite variants/*.json for THIS game (template ones are Timber Rush keys):
-      `long_goal` (K.GOAL 9: 5.7 moves, win 13.8 s — more invested play), `pick_dress` / `pick_window` (K.PICK: the hand and the
-      auto-pick point at a stronger payoff than the comb), `sad_end` (K.SMILE 0: does the faint smile help the endcard?),
-      `no_story` (skip INTRO, start in CHOICE — is the story worth 2 s?), `cta_copy` ("SAVE MIA" vs "PLAY FREE").
-      `python tools/build_playable.py --variant all`; README.md case study (refs described, not shipped; hypotheses;
-      sizes; fps; critic scores; known gaps). Commit.
+- [x] 5. DONE 2026-10-09 (Sonnet 5.5). variants/: default, long_goal (GOAL 9), pick_dress, pick_window (K.PICK), sad_end (K.SMILE 0),
+      no_story (K.STORY 0: opens on the bubbles; demo now taps PICK DEMO_PICK_AFTER s after the choice phase starts), cta_copy
+      ("copy": {"cta": "SAVE MIA"}, read at render time by scene.ctaTxt() because the build applies overrides after the modules).
+      Old Timber Rush variants deleted. `verify.sh all` = VERIFY OK for all 7 (1.24 MB each, google 0.89, meta under 2 MB, 61 fps).
+      README.md = the case study (flow, workflow, measured numbers, variants, build/test commands, repo map, honest gaps).
+      Headless demo per variant: GOAL 9 win 13.4/end 17.2 s; STORY 0 win 4.5/end 8.2 s; PICK dress win 6.7/end 10.4 s.
 - [ ] 6. PUBLISH — ASK THE USER FIRST: public repo `bankaino/snowbound-home-playable` + Pages from /docs
       (`python tools/build_playable.py --variant all --pages docs`). Never push study/ref or reference frames.
 

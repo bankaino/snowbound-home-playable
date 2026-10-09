@@ -13,6 +13,7 @@
   const GOALP = [UI.goal.x + 84, UI.goal.y + UI.goal.h / 2];                   // where goal tiles land (the panel's icon)
   const HERO = [W * 0.5, H * 0.80];                                            // shelter hero: centre x, bottom y [ART]
   let OX = 0, OY = 0, ZF = 1;                                                          // trauma shake of the world this frame
+  const ctaTxt = () => ((window.VARIANT || {}).copy || {}).cta || 'PLAY FREE';  /* read at render time: the build applies variant overrides after the modules load */   // A/B copy test (variants/*.json: "copy": {"cta": ...})
   S.hit = [];
 
   // sprite helpers (view px)
@@ -82,7 +83,7 @@
       L.puff(x, y, 6 + 6 * rnd(i, 4), [1, 1, 1], 0.5 * (1 - 0.9 * (1 - snowOn)), i); }
     L.solid(0, 0, W, H, [0.05, 0.1, 0.3], 0, 0, 0, 0.16 * (1 - wg));          // the room stays cold; only a repaired window warms it a little
     L.solid(0, 0, W, H, [1.0, 0.65, 0.25], 0, 0, 0, 0.16 * wg);
-    if (ST.cut >= 0 && GT - ST.cut < 0.3) L.solid(0, 0, W, H, [1, 1, 1], 0, 0, 0, 0.95 * (1 - (GT - ST.cut) / 0.3));   // whip flash on the cut
+    if (ST.cut > 0.01 && GT - ST.cut < 0.3) L.solid(0, 0, W, H, [1, 1, 1], 0, 0, 0, 0.95 * (1 - (GT - ST.cut) / 0.3));   // whip flash on the cut
     if (reveal) { const wp = imgPt('bg_room', Z.winAt[0], Z.winAt[1]); if (win) L.glow(wp[0], wp[1], 700, [1, 0.8, 0.45], 0.5 * warm, 2.2); else L.glow(HERO[0], choice === 'comb' ? HERO[1] - 640 : HERO[1] - 400, 520, [1, 0.8, 0.5], 0.35 * Math.sin(Math.PI * Math.min(1, rt / 2.4)), 2.2);   // light only where the change happened
       if (rt > 0.35 && rt < 0.65) L.solid(0, 0, W, H, [1, 0.97, 0.85], 0, 0, 0, 0.55 * (1 - Math.abs(rt - 0.5) / 0.15)); }       // bloom flash as the swirl closes, warm light pours in
     L.beginComp();
@@ -177,7 +178,7 @@
       L.rrect(24, by - 18, W - 48, bh + 36, 30, [0.06, 0.09, 0.18], [0.03, 0.05, 0.10], 0.72); L.uiBox('ctabar', 24, by - 18, W - 48, bh + 36, 4);
       L.label('brand', 'SNOWBOUND HOME', 66, by + bh / 2, { size: 44, font: FONT, col: '#ffffff', out: '#12305a' });
       L.rrect(bx - (pul - 1) * bw / 2, by - (pul - 1) * bh / 2, bw * pul, bh * pul, bh / 2, [0.45, 0.85, 0.35], [0.20, 0.62, 0.15]); L.uiBox('cta', bx, by, bw, bh, 2);
-      L.label('cta', 'PLAY FREE', bx + bw / 2, by + bh / 2, { size: 48, font: FONT, col: '#ffffff', out: '#145a10', al: 0.5 });
+      L.label('cta', ctaTxt(), bx + bw / 2, by + bh / 2, { size: 48, font: FONT, col: '#ffffff', out: '#145a10', al: 0.5 });
       S.hit.push({ id: 'cta', x: bx, y: by, w: bw, h: bh }); }
 
     // ===================== endcard =====================
@@ -193,13 +194,13 @@
       const sm = pop(0.35); if (sm > 0.01) { const sf = win && K.SMILE ? '_smile' : '', n0 = win ? (choice === 'dress' ? 'hero_dress' : choice === 'comb' ? 'hero_comb' : 'hero_sad') : 'hero_sad', n = has(n0 + sf) ? n0 + sf : n0;
         L.glow(W / 2, Y(900), 380, [1, 0.85, 0.4], win ? 0.22 : 0.1, 2.2); L.shadow(W / 2, Y(1245), 380 * sm, 46 * sm, 0.5); spr(n, W / 2, Y(900), 0, 680 * sm * (1 + 0.012 * Math.sin(t * 2.2)));
         if (win) for (let j = 0; j < 8; j++) { const q = (t * 0.6 + j / 8) % 1; L.star(W / 2 + (rnd(j, 1) - 0.5) * 520, Y(1180) - 520 * q, 22, [1, 0.92, 0.55], Math.sin(Math.PI * q) * k); } }
-      const s2 = pop(0.45); if (s2 > 0.01) { const st = win ? '6/6 ✓' : ST.got + '/' + K.GOAL, tw = L.labelW('stat', st, { size: 54, font: FONT }) + 70;
+      const s2 = pop(0.45); if (s2 > 0.01) { const st = win ? K.GOAL + '/' + K.GOAL + ' ✓' : ST.got + '/' + K.GOAL, tw = L.labelW('stat', st, { size: 54, font: FONT }) + 70;
         L.rrect(W / 2 - tw / 2, Y(1300) - 46, tw, 92, 46, [0.12, 0.2, 0.1], [0.06, 0.12, 0.05], 0.8 * s2); L.uiBox('statp', W / 2 - tw / 2, Y(1300) - 46, tw, 92, 4);
         L.label('stat', st, W / 2, Y(1300), { size: Math.round(54 * s2), font: FONT, col: '#bff58a', out: '#173307', al: 0.5 }); }
       const s3 = pop(0.7), pul = 1 + 0.045 * Math.sin(t * 6), bw = 640 * s3 * pul, bh = 170 * s3 * pul, bx = W / 2 - bw / 2, by = Y(1480) - bh / 2;
       if (s3 > 0.01) { L.glow(W / 2, Y(1480), 420, [1, 0.8, 0.3], 0.3, 2.2);
         L.rrect(bx, by + 12, bw, bh, bh / 2, [0.15, 0.45, 0.10], [0.10, 0.35, 0.06]); L.rrect(bx, by, bw, bh, bh / 2, [0.55, 0.95, 0.40], [0.25, 0.72, 0.15]); L.uiBox('endcta', bx, by, bw, bh, 2);
-        L.label('endcta', 'PLAY FREE', W / 2, by + bh / 2, { size: Math.round(86 * s3), font: FONT, col: '#ffffff', out: '#145a10', al: 0.5 });
+        L.label('endcta', ctaTxt(), W / 2, by + bh / 2, { size: Math.round(86 * s3), font: FONT, col: '#ffffff', out: '#145a10', al: 0.5 });
         S.hit.push({ id: 'cta', x: bx, y: by, w: bw, h: bh }); }
       if (a > 1.2) { L.label('replay', '↻ REPLAY', W / 2, Y(1710), { size: 46, font: FONT, col: '#ffffff', out: '#12305a', al: 0.5, a: SS(1.2, 1.6, a) });
         S.hit.unshift({ id: 'replay', x: W / 2 - 170, y: Y(1670), w: 340, h: 80 }); }
