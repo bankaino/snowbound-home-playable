@@ -1,60 +1,68 @@
 {
   "title": "Snowbound Home",
   "store": {
-    "android": "https://play.google.com/store/apps/details?id=com.example.timberrush",
+    "android": "https://play.google.com/store/apps/details?id=com.example.snowboundhome",
     "ios": "https://apps.apple.com/app/id0000000000"
   },
   "textures": {
-    "ground_tex": [
-      512,
+    "bg_room": [
+      1024,
       "lossy"
     ],
-    "tree_0": [
-      176,
+    "bg_outside": [
+      1024,
+      "lossy"
+    ],
+    "door": [
+      420,
       "alpha"
     ],
-    "tree_1": [
-      176,
-      "alpha"
-    ],
-    "tree_2": [
-      176,
-      "alpha"
-    ],
-    "stump": [
-      64,
-      "alpha"
-    ],
-    "harvester_body": [
+    "hero_sad": [
       720,
       "alpha"
     ],
-    "rival_body": [
+    "hero_happy": [
       720,
       "alpha"
     ],
-    "trailer": [
-      340,
+    "hero_dress": [
+      720,
       "alpha"
     ],
-    "rival_trailer": [
-      340,
+    "hero_snow": [
+      620,
       "alpha"
     ],
-    "coin": [
-      144,
+    "tile_leaf": [
+      160,
+      "alpha"
+    ],
+    "tile_coin": [
+      160,
+      "alpha"
+    ],
+    "tile_yarn": [
+      160,
+      "alpha"
+    ],
+    "tile_comb": [
+      160,
+      "alpha"
+    ],
+    "tile_window": [
+      160,
+      "alpha"
+    ],
+    "tile_dress": [
+      160,
+      "alpha"
+    ],
+    "window_patch": [
+      460,
       "alpha"
     ],
     "hand": [
       272,
-      "alpha"
-    ],
-    "log": [
-      96,
-      "alpha"
-    ],
-    "mascot": [
-      620,
       "alpha"
     ]
   }

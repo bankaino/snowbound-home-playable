@@ -37,8 +37,8 @@ BOARD (like 4_match3, room dimmed + blurred-ish via dark overlay behind it):
   bounce, refill from above, cascades (chime pitch rises per cascade, callouts "SWEET!" / "GREAT!" / "AMAZING!").
   Match of 4+ in a line → line blast clears the whole row/column (glowing beam in code, shake) — the board's wow.
   Goal tiles cleared fly to the goal panel (reuse coins-fly-to-HUD), counter pops; S.money = goal items collected.
-  The START board is hand-authored in sim.js (no matches on it): the hinted first swap makes 4 goal tiles in a line →
-  line blast → cascade ⇒ ≥ 4/6 after move 1; any sensible 2nd move finishes. Refill = seeded RNG with K.GOAL_BIAS
+  The START board is fixed in sim.js (see phase 1 note): the hinted first swap clears ≥4 goal tiles (line blast),
+  the 2nd finishes. Refill = seeded RNG with K.GOAL_BIAS
   (0.30) toward goal tiles; if no move exists → reshuffle (deterministic). `bestMove(S)` (most goal tiles, then most
   tiles) drives: the idle hand (idle > 2.5 s → ghost-swipe of bestMove), scriptInput (demo) and the smoke test.
 REVEAL (wow, ~2.8 s): board drops out, room comes back to full brightness, magic swirl (sparkle ring in code) around
@@ -102,13 +102,26 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
 ## Phases (one Sonnet session each; tick and note results here)
 - [x] 0. Questions answered; project created on placeholders (`new.py . --title "Snowbound Home"`), refs copied to
       study/ref (temp paths die with the session), template `verify.sh` = VERIFY OK (template game still in place).
-- [ ] 1. GIT first: `git init -b main` HERE (folder is inside the azuregames repo — nested repo like siege_cart),
-      .gitignore (study/ref, ref.png, frames, art/raw, art/logs, art/placeholder, dist, *.resolved.json), author per repo
-      (`git config user.name Artem`, `user.email 208152625+bankaino@users.noreply.github.com`), commit "scaffold".
-      SIM: rewrite sim.js (phases, grid, swap/clear/fall/refill, bestMove, authored start board, UI rects, demo,
-      demoCheck). Headless tuning: print S.ev times from SIM.at until demoCheck passes; unit-check in node that the
-      start board has no matches and that bestMove's first swap reaches ≥ 4/6. Adapt smoke_test.mjs. build.json +
-      sizes.js + placeholders. `verify.sh` green. Commit "sim: story + match-3".
+- [x] 1. DONE 2026-10-09 (Sonnet 5.5). Nested git repo (author set per repo), commits "scaffold" + "sim: story + match-3".
+      sim.js rewritten: phases intro→choice→board→reveal→end, 5×6 grid as timed states (swap/back/clear/fall/refill),
+      swipe + tap-select input, bestMove(), reshuffle, auto-pick after 4 s, END_* rules, scriptInput demo, demoCheck.
+      DEVIATIONS from the text above (this is now the truth):
+      · START board is NOT the hand-authored one: it was found by a seeded search (/tmp script, 60k boards) so that the
+        hinted swap clears ≥4 goal tiles and the 2nd swap wins: `['YGYCL','LLGYC','LYYGL','CYLCG','CGGYG','LCGGL']`.
+        Demo timeline (real): choose 3.5 · swap 4.9 · 4/6 at 5.06 (line blast) · swap 2 at 6.3 · win 6.64 · reveal 7.0 ·
+        endcard 9.8 s · passive viewer: auto-pick 6.2, endcard 12.0 s. L = 20 s loop. (Shorter than the 13 s above; fine.)
+      · Refill avoids free 3-runs (pass 2 in removeAndFall) so cascades come from the board, not luck.
+      · live/scene.js is a PHASE-1 PLACEHOLDER (flat shapes + coloured placeholder tiles, all phases drawn, hit areas, QA
+        states, CTA bar, endcard). Phase 2 rewrites the world drawing; keep S.hit / S.QA / caption+CTA+endcard blocks.
+      · art/gen holds coloured placeholders (bg_* gradients, round tiles, boxes for heroes) for ALL textures in build.json;
+        gen_batch.py moves them to art/placeholder before generating. Template textures/prompts removed (examples stay).
+      · smoke_test.mjs now: wait 2.8 s → tap COMB → swipe SIM best move up to 3× → check S.money > 0 → tap CTA.
+      · audio.js: engine drone disabled (S.p gone); sounds still the template's — phase 2 replaces them.
+      · sim API for scene/tests: SIM.UI {grid, board, goal, bubbles, ORDER, cellXY, cellAt}, SIM.bestMove(kinds),
+        S.bd {cells[{k,fy,vy,ox,oy,clr}], busy, idleSince, best}, S.sel, events: intro_cut bubbles choose swap bad match
+        blast cascade goal win reveal end shuffle. Cell kind 3 = goal tile (texture by S.choice).
+      verify.sh: VERIFY OK (qa 9 states, 0.13 MB per network, 61 fps, smoke goal 7/6). Headless checks done: skip intro by tap,
+      bad swap + restore, tap-select swap, idle → endcard at 13 s, JSON round-trip of state.
 - [ ] 2. SCENE on placeholders: intro shots + cut, hero stack, bubbles, board + tiles (BATCH), goal panel, reveal +
       tint, HUD/CTA/endcard, juice per verb (instant: squash/shake/flash · short: sparkles, fly-to-panel, sound ·
       long: cleared cells glow briefly, room stays warm), audio.js sounds. `verify.sh` green. Commit.

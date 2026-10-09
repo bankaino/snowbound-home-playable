@@ -43,7 +43,7 @@
       // coins land in the pill 0.7 s after their tree falls: one pling per landing, throttled
       for (const e of S.ev) if (e.k === 'cut' && e.coin && e.t + 0.7 > last && e.t + 0.7 <= S.t && now - lastCoin > 0.07) { SFX.coin(now); lastCoin = now; break; }
       last = S.t;
-      const v = S.p ? Math.min(1, S.p.v / 330) : 0, on = S.end < 0 ? 1 : 0;
+      const v = 0, on = 0;                                                 // phase 1: no engine drone in a snow story (phase 2 replaces this file's sounds)
       eng.g.gain.setTargetAtTime((0.035 + 0.05 * v) * on, now, 0.08); eng.o1.frequency.setTargetAtTime(44 + 40 * v, now, 0.1); eng.o2.frequency.setTargetAtTime(45.5 + 41 * v, now, 0.1);
       eng.f.frequency.setTargetAtTime(300 + 500 * v, now, 0.1);
     },
