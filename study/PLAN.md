@@ -206,6 +206,13 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
   hero_sad_smile, hero_frozen, hero_snow (all messy, no braid). Braided originals kept in art/ref/*_braid.png. K.PICK stays 'comb'.
 - Remaining critic-C ideas NOT done (ask first): tap hint + bubbles earlier (story 3.4 s), valid-pair highlight after 3 bad swaps, endcard hero 820 px.
 
+## Phase 5f (2026-10-09, user: "no sound until I click")
+- Cause: browsers keep WebAudio suspended until a user gesture; our context was only created on the first tap, so even in ad webviews that allow
+  autoplay the door slam/wind would be silent until the first touch. Now audio.js tries to start at load (sound from frame 0 where the network
+  allows it), also unlocks on touchend/click/pointerdown/keydown (iOS), and while locked it drops events (only the last 0.3 s may still sound)
+  so nothing old bursts out on unlock. User decision: NO on-screen sound button. Not verifiable in headless Chromium (it never stays blocked):
+  test in the networks' own preview tools. The ad must stay understandable muted (captions + visuals do that).
+
 - [ ] 6. PUBLISH — ASK THE USER FIRST: public repo `bankaino/snowbound-home-playable` + Pages from /docs
       (`python tools/build_playable.py --variant all --pages docs`). Never push study/ref or reference frames.
 

@@ -1,21 +1,26 @@
 // live/audio.js — procedural sound (WebAudio, zero asset bytes) driven by the sim event bus S.ev.
-// index.html calls AUDIO.tick(state) once per frame in play mode; the context starts on the first user gesture
-// (autoplay policy) and AUDIO.mute(bool) is wired to ad-network viewability / audio-volume callbacks.
+// index.html calls AUDIO.tick(state) once per frame in play mode. Browsers keep the context 'suspended' until a user gesture (autoplay policy):
+// we try to start at load (works in ad-network webviews that allow autoplay → sound from the first frame), otherwise it unlocks on the first
+// pointer/touch/key. Events that happened while locked are dropped, so no burst of old sounds on unlock. No on-screen button by design.
+// AUDIO.mute(bool) is wired to ad-network viewability / audio-volume callbacks.
 (function () {
-  let ac = null, out = null, wind = null, last = -1, muted = false;
+  let ac = null, out = null, wind = null, last = -1, muted = false, tryAt = -9;
   const PENTA = [523, 587, 659, 784, 880, 1047, 1175, 1319];
   let nbuf = null;
   const noise = () => { if (nbuf) return nbuf; nbuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); const d = nbuf.getChannelData(0);
     let s = 12345; for (let i = 0; i < d.length; i++) { s = (s * 16807) % 2147483647; d[i] = (s / 2147483647) * 2 - 1; } return nbuf; };
   const start = () => {
-    if (ac) { if (ac.state === 'suspended') ac.resume(); return; }
+    if (ac) { if (ac.state !== 'running') ac.resume().then(silence).catch(() => {}); return; }
     const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
     ac = new C(); out = ac.createGain(); out.gain.value = muted ? 0 : 0.55; out.connect(ac.destination);
     // wind: looped noise through a band-pass whose centre drifts (gust) — a cold room under it all
     const s = ac.createBufferSource(); s.buffer = noise(); s.loop = true; const f = ac.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 520; f.Q.value = 0.7;
     const g = ac.createGain(); g.gain.value = 0; s.connect(f); f.connect(g); g.connect(out); s.start(); wind = { g, f };
+    if (ac.state !== 'running') ac.resume().then(silence).catch(() => {});
   };
-  addEventListener('pointerdown', start, { capture: true }); addEventListener('keydown', start, { capture: true });
+  const silence = () => { try { const b = ac.createBuffer(1, 1, 22050), q = ac.createBufferSource(); q.buffer = b; q.connect(ac.destination); q.start(0); } catch (e) {} };   // iOS: a 1-sample buffer inside the gesture unlocks output
+  for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) addEventListener(ev, start, { capture: true });
+  try { start(); } catch (e) {}                                              // allowed in some ad webviews / after a previous gesture; otherwise stays suspended
   const env = (node, t0, a, peak, dur) => { const g = ac.createGain(); g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(peak, t0 + a);
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur); node.connect(g); g.connect(out); return g; };
   const tone = (freq, t0, dur, type = 'sine', peak = 0.2, slide = 0) => { const o = ac.createOscillator(); o.type = type; o.frequency.setValueAtTime(freq, t0);
@@ -43,9 +48,12 @@
   };
   window.AUDIO = {
     mute: (m) => { muted = m; if (out) out.gain.value = m ? 0 : 0.55; },
+    locked: () => !ac || ac.state !== 'running',
+    unlock: () => start(),
     tick: (S) => {
       if (!ac || !S) return; const now = ac.currentTime;
       if (S.t < last) last = -1;                                           // restart / replay
+      if (ac.state !== 'running') { if (S.t - tryAt > 0.5) { tryAt = S.t; ac.resume().catch(() => {}); } last = Math.max(last, S.t - 0.3); return; }   // locked: only the last 0.3 s may still sound once it unlocks
       for (const e of S.ev) { if (e.t <= last) continue; if (SFX[e.k]) SFX[e.k](now, e); }
       last = S.t;
       const cold = S.end < 0 && S.phase !== 'reveal' ? 1 : S.phase === 'reveal' ? (S.choice === 'window' ? Math.max(0, 1 - (S.t - S.phaseT) / 1.2) : 1) : 0;   // wind dies when the room warms up
