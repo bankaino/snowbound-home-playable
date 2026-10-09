@@ -64,6 +64,18 @@
     "hand": [
       272,
       "alpha"
+    ],
+    "hero_sad_smile": [
+      720,
+      "alpha"
+    ],
+    "hero_comb_smile": [
+      720,
+      "alpha"
+    ],
+    "hero_dress_smile": [
+      720,
+      "alpha"
     ]
   }
 }

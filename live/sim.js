@@ -9,8 +9,9 @@
   const K = {
     COLS: 5, ROWS: 6, CELL: 170, GOAL: 6, GOAL_BIAS: 0.30, GOAL_MIN: 3,        // grid, goal count, refill bias, min goal tiles kept on the board
     SWIPE_PX: 60, SWAP_T: 0.14, CLEAR_T: 0.18, FALL_G: 5200, BOUNCE: 0.22,
-    INTRO_CUT: 1.2, INTRO_END: 2.2, AUTO_PICK: 4, BOARD_IN: 0.7, HAND_IDLE: 2.5, WIN_DELAY: 0.35, REVEAL_T: 2.8,
-    END_MAX: 28, END_NO_INPUT: 12, END_IDLE: 10,
+    INTRO_CUT: 1.2, INTRO_END: 2.2, AUTO_PICK: 2.5, BOARD_IN: 0.7, HAND_IDLE: 2.5, WIN_DELAY: 0.35, REVEAL_T: 3.4,
+    PICK: 'comb', SMILE: 1, BAD_HINT: 2,                                         // hand + auto-pick target (A/B), faint smile in the final frames (A/B), bad swaps before the hand shows up
+    END_MAX: 22, END_NO_INPUT: 14, END_IDLE: 10,
     DEMO_CHOOSE: 3.5, DEMO_THINK: 0.55, DEMO_SWIPE: 0.4,
   };
   const N = K.COLS * K.ROWS, GOALK = 3;                                         // tile kinds: 0 leaf, 1 coin, 2 yarn, 3 GOAL (comb | window | dress)
@@ -20,13 +21,13 @@
   const START = ['YGYCL', 'LLGYC', 'LYYGL', 'CYLCG', 'CGGYG', 'LCGGL'];
 
   // ---------------- layout (shared by scene, smoke test and demo) ----------------
-  const BX = (W - K.COLS * K.CELL) / 2, BY = Math.round(H * 0.30), GW = K.COLS * K.CELL, GH = K.ROWS * K.CELL;
+  const BX = (W - K.COLS * K.CELL) / 2, BY = Math.max(Math.round(H * 0.27), Math.min(Math.round(H * 0.33), Math.round((H - K.ROWS * K.CELL) / 2 + 30))), GW = K.COLS * K.CELL, GH = K.ROWS * K.CELL;
   const cellXY = (i) => [BX + (i % K.COLS + 0.5) * K.CELL, BY + (Math.floor(i / K.COLS) + 0.5) * K.CELL];
   const cellAt = (x, y) => { const c = Math.floor((x - BX) / K.CELL), r = Math.floor((y - BY) / K.CELL); return c < 0 || r < 0 || c >= K.COLS || r >= K.ROWS ? -1 : r * K.COLS + c; };
   const UI = {
     grid: { x: BX, y: BY, w: GW, h: GH }, board: { x: BX - 24, y: BY - 24, w: GW + 48, h: GH + 48 },
     goal: { x: W / 2 - 250, y: BY - 24 - 190, w: 500, h: 150 },
-    bubbles: { window: { x: W * 0.50, y: H * 0.20, r: 135 }, comb: { x: W * 0.80, y: H * 0.32, r: 135 }, dress: { x: W * 0.22, y: H * 0.43, r: 135 } },
+    bubbles: { window: { x: W * 0.50, y: Math.max(H * 0.20, 460), r: 135 }, comb: { x: W * 0.80, y: H * 0.32, r: 135 }, dress: { x: W * 0.22, y: H * 0.43, r: 135 } },
     ORDER: ['window', 'comb', 'dress'], cellXY, cellAt,
   };
 
@@ -78,13 +79,14 @@
     bd.best = bestMove(kinds(bd.cells));
   }
   function beginClear(S, m) {
-    const bd = S.bd, t = S.t; bd.casc++; let ng = 0;
+    const bd = S.bd, t = S.t; bd.casc++; S.badStreak = 0; let ng = 0;
     for (let i = 0; i < N; i++) if (m.mark[i]) { const c = bd.cells[i]; c.clr = t;
       if (c.k === GOALK) { ng++; S.got++; S.money = S.earned = S.got; const [x, y] = cellXY(i); S.ev.push({ k: 'goal', t, x, y, n: S.got, i }); } }
     const [cx, cy] = centre(S, m.mark);
     const idx = [], kk = []; for (let i = 0; i < N; i++) if (m.mark[i]) { idx.push(i); kk.push(bd.cells[i].k); }   // for the scene's sparkles
     S.ev.push({ k: 'match', t, n: m.n, ng, casc: bd.casc, x: cx, y: cy, idx, kk });
     for (const b of m.blasts) S.ev.push({ k: 'blast', t, row: b.row, col: b.col, x: b.row !== undefined ? W / 2 : cellXY(b.col)[0], y: b.row !== undefined ? cellXY(b.row * K.COLS)[1] : BY + GH / 2 });
+    if (m.blasts.length) S.freeze = 0.06;                                      // hit-stop: the world holds for 60 ms on a line blast
     if (bd.casc > 1) S.ev.push({ k: 'cascade', t, n: bd.casc, x: cx, y: cy });
     bd.busy = 'clear'; bd.t0 = t;
   }
@@ -127,7 +129,7 @@
         cells[a].ox = (pb[0] - pa[0]) * e; cells[a].oy = (pb[1] - pa[1]) * e; cells[b].ox = (pa[0] - pb[0]) * e; cells[b].oy = (pa[1] - pb[1]) * e;
         if (u >= 1) { const k2 = kinds(cells); [k2[a], k2[b]] = [k2[b], k2[a]]; const m = findMatches(k2);
           if (m.n) { [cells[a], cells[b]] = [cells[b], cells[a]]; cells[a].ox = cells[a].oy = cells[b].ox = cells[b].oy = 0; S.moves++; bd.casc = 0; beginClear(S, m); }
-          else { bd.busy = 'back'; bd.t0 = t; const [x, y] = pa; S.ev.push({ k: 'bad', t, a, b, x, y }); } } break; }
+          else { bd.busy = 'back'; bd.t0 = t; const [x, y] = pa; S.badStreak = (S.badStreak || 0) + 1; S.ev.push({ k: 'bad', t, a, b, x, y }); } } break; }
       case 'back': { const { a, b } = bd.sw, pa = cellXY(a), pb = cellXY(b), f = 1 - e;
         cells[a].ox = (pb[0] - pa[0]) * f; cells[a].oy = (pb[1] - pa[1]) * f; cells[b].ox = (pa[0] - pb[0]) * f; cells[b].oy = (pa[1] - pb[1]) * f;
         if (t - bd.t0 >= K.SWAP_T) { cells[a].ox = cells[a].oy = cells[b].ox = cells[b].oy = 0; setIdle(S); } break; }
@@ -146,6 +148,7 @@
   }
 
   function step(S, inp) {
+    if (S.freeze > 0) { S.freeze -= DT; S.steps++; return S; }
     const t = S.t + DT; S.t = t; S.steps++;
     if (S.ev.length > 220) S.ev.splice(0, S.ev.length - 220);
     const press = !!inp.press, edge = press && !S.prevPress, rel = !press && S.prevPress; S.prevPress = press;
@@ -159,7 +162,7 @@
       let pick = '';
       if (edge && t - S.phaseT > 0.2) for (const n of UI.ORDER) { const b = UI.bubbles[n]; if (Math.hypot(inp.px - b.x, inp.py - b.y) <= b.r + 20) { pick = n; break; } }
       const auto = !pick && t - Math.max(S.phaseT, S.lastIn) > K.AUTO_PICK;      // nobody tapped: the comb is chosen so a passive viewer still sees the game
-      if (pick || auto) { S.choice = pick || 'comb'; S.auto = auto; S.phase = 'board'; S.phaseT = t; S.bd = createBoard(S); S.ev.push({ k: 'choose', t, kind: S.choice, auto }); }
+      if (pick || auto) { S.choice = pick || K.PICK; S.auto = auto; S.phase = 'board'; S.phaseT = t; S.bd = createBoard(S); S.ev.push({ k: 'choose', t, kind: S.choice, auto }); }
     } else if (S.phase === 'board') stepBoard(S, inp, edge, rel, press);
     else if (S.phase === 'reveal' && t - S.phaseT >= K.REVEAL_T) endGame(S, 'win');
     if (S.end < 0 && S.phase !== 'reveal' && !(S.bd && S.bd.busy === 'won')) {
@@ -173,7 +176,7 @@
   const scriptInput = (t, S) => {
     const inp = { press: 0, px: W / 2, py: H / 2 };
     if (S.end >= 0) return inp;
-    if (S.phase === 'choice') { const b = UI.bubbles.comb; inp.px = b.x; inp.py = b.y; if (t >= K.DEMO_CHOOSE && t < K.DEMO_CHOOSE + 0.15) inp.press = 1; }
+    if (S.phase === 'choice') { const b = UI.bubbles[K.PICK]; inp.px = b.x; inp.py = b.y; if (t >= K.DEMO_CHOOSE && t < K.DEMO_CHOOSE + 0.15) inp.press = 1; }
     else if (S.phase === 'board' && S.bd.busy === 'idle' && S.bd.best) {
       const u = (t - S.bd.idleSince - K.DEMO_THINK) / K.DEMO_SWIPE, [ax, ay] = cellXY(S.bd.best.a), [bx, by] = cellXY(S.bd.best.b), k = Math.max(0, Math.min(1, u));
       inp.px = ax + (bx - ax) * k; inp.py = ay + (by - ay) * k; if (u >= 0 && u <= 1.15) inp.press = 1;

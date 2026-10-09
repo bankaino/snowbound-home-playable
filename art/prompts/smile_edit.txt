@@ -1,0 +1,4 @@
+Use case: final-frame variant of a character sprite with only a faint relieved smile (transparent canvas, drawn over the same background).
+Edit of Image 2: keep EVERYTHING pixel-identical: the same armchair with the same tears and snow, the same pose, canvas placement, scale, hair (exactly as it is, messy or neat as in Image 2), clothes (exactly as in Image 2), bare feet, the baby and the pale-blue blanket, shading and colours. Change ONLY her facial expression: the worried frown and sad eyes become a faint, gentle, relieved little smile with softened eyes and slightly relaxed brows, still looking down at the baby, a tiny hopeful warmth, not a big grin. The cheeks stay slightly pink from the cold.
+Composition: identical to Image 2 (same canvas placement, same scale).
+Constraints: one character group only, no background, no ground, no shadow, no text.

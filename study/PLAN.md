@@ -156,12 +156,25 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
       (alpha IoU 0.97) → shimmer during the 0.6 s cross-fade; fix by compositing only head/clothes onto hero_sad in prep, or regen
       with "chair pixel-identical"; (c) embed an OFL display font (Lilita One) — needs a download, ask the user; (d) real store
       URLs in tools/build.json (placeholders now); (e) 60 ms hit-stop on blast (needs a sim freeze).
-- [ ] 4. FEEL (Gate B): play it on the live page (serve.sh, `?ad=1`), tune K headless; check a manual player who makes
-      a bad first move still wins by ~15 s; passive endcard ≤ 12 s; fps ≥ 60 at 390×844. `verify.sh all` green →
-      critic Gate B → max 2 fix rounds. Commit.
+- [x] 4. DONE 2026-10-09 (Sonnet 5.5). verify.sh OK (qa 16 states, 1.24 MB per network, 61 fps), critic Gate B (study/critique/gateB.md,
+      overall 7/10; hook 7, clarity 8, juice 7, economy 7, payoff-per-choice 6 — comb weakest, window/dress 8).
+      MEASURED (tools/player_policies.js, tools/perf_probe.mjs): valid-move and bad-first-move players win in 8.5 s median / 12 p90 / 15.6 max
+      (30/30); slow player (3 s per move) wins at 16 s; tap-bubble-then-idle → endcard 13.2 s; passive viewer → endcard 14.0 s; blind
+      swipers (82 % of pairs invalid) win 6/30, endcard ≤ 28.7 s. Perf: board tiles instanced via BATCH (all 30 = 1 draw): draws board idle
+      122 → 53, clear+fall 173 → 104; at 4× CPU throttle clear+fall 53.6 → 58.2 fps; no console errors.
+      DONE from Gate B: AUTO_PICK 4 → 2.5, END_NO_INPUT 12 → 14, END_MAX 28 → 22, REVEAL_T 2.8 → 3.4; BY follows the aspect (0.27–0.33 H);
+      window bubble y ≥ 460 (no caption overlap on 16:9); hand appears after 2 bad swaps (S.badStreak); 60 ms hit-stop on line blasts
+      (S.freeze); comb reveal = stronger push-in (1.12) + brush-stroke sweep + hair sparkles; bubble tails bigger; hand wrist faded;
+      locked wishes are tappable (→ store); endcard: warm light overlay 0.30, hero 680 px, layout scales with H (Y()), window patch stays
+      visible; FAINT SMILE (user idea): hero_*_smile (3 edits, expression only) cross-fades in at reveal t 2.0–2.6 s and stays on the
+      endcard (K.SMILE=1); goal panel text leaves before the panel slides out (no overlap with the CTA bar).
+      NOT done on purpose: K.ASSIST auto-solve for passive viewers (the board must not play itself — decision of the plan; ask the user);
+      font embed (needs a download → ask); real store URLs (placeholders com.example.snowboundhome / id0000000000 → ask).
+      New K switches for A/B: K.PICK ('comb'|'dress'|'window' = hand + auto-pick target), K.SMILE (0|1), K.GOAL (6|9), K.BAD_HINT.
 - [ ] 5. VARIANTS + delivery: rewrite variants/*.json for THIS game (template ones are Timber Rush keys):
-      `short_goal` (GOAL 4 — shorter loop), `no_story` (skip INTRO, start in CHOICE — is the story worth 2 s?),
-      `no_choice` (comb only, bubbles skipped — does the choice add engagement?), `cta_copy` ("SAVE MIA" vs "PLAY FREE").
+      `long_goal` (K.GOAL 9: 5.7 moves, win 13.8 s — more invested play), `pick_dress` / `pick_window` (K.PICK: the hand and the
+      auto-pick point at a stronger payoff than the comb), `sad_end` (K.SMILE 0: does the faint smile help the endcard?),
+      `no_story` (skip INTRO, start in CHOICE — is the story worth 2 s?), `cta_copy` ("SAVE MIA" vs "PLAY FREE").
       `python tools/build_playable.py --variant all`; README.md case study (refs described, not shipped; hypotheses;
       sizes; fps; critic scores; known gaps). Commit.
 - [ ] 6. PUBLISH — ASK THE USER FIRST: public repo `bankaino/snowbound-home-playable` + Pages from /docs

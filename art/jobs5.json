@@ -1,0 +1,5 @@
+[
+ {"name": "hero_sad_smile", "prompt": "smile_edit.txt", "size": "1024x1024", "ref": ["art/gen/hero_sad.png=edit target: change ONLY the facial expression to a faint relieved smile"]},
+ {"name": "hero_comb_smile", "prompt": "smile_edit.txt", "size": "1024x1024", "ref": ["art/gen/hero_comb.png=edit target: change ONLY the facial expression to a faint relieved smile"]},
+ {"name": "hero_dress_smile", "prompt": "smile_edit.txt", "size": "1024x1024", "ref": ["art/gen/hero_dress.png=edit target: change ONLY the facial expression to a faint relieved smile"]}
+]
