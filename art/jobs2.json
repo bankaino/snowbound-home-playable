@@ -1,0 +1,6 @@
+[
+ {"name": "hero_happy", "prompt": "hero_happy.txt", "size": "1024x1024", "ref": ["art/gen/hero_sad.png=edit target: keep everything, change only expression and hair"]},
+ {"name": "hero_dress", "prompt": "hero_dress.txt", "size": "1024x1024", "ref": ["art/gen/hero_sad.png=edit target: keep everything, change only the clothes"]},
+ {"name": "hero_snow", "prompt": "hero_snow.txt", "size": "1536x1024", "ref": ["art/gen/hero_sad.png=character design reference only"]},
+ {"name": "window_patch", "prompt": "window_patch.txt", "size": "1024x1024", "ref": ["art/ref/window_crop.png=edit target: repair only the window"]}
+]

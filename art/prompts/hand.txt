@@ -1,0 +1,4 @@
+Use case: tutorial pointer for a mobile game ad ("swipe here" hint), in the same soft painted style.
+Subject: a friendly cartoon hand with smooth light skin and soft shading, index finger extended pointing UP and slightly left, other fingers curled, thumb resting on the side, a short cuff of a mustard knit sleeve at the wrist. The fingertip touches the very top of the image at about 33% of the image width from the left.
+Composition: one hand, upright, filling about 90% of the canvas height, margin on the sides and bottom.
+Constraints: no text, no motion lines, no shadow, no glow, no background.

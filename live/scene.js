@@ -12,22 +12,24 @@
   const TCOL = [[0.35, 0.85, 0.35], [1, 0.8, 0.2], [0.95, 0.3, 0.35]], GCOL = { comb: [0.5, 0.65, 1], window: [0.55, 0.85, 1], dress: [0.7, 0.95, 0.3] };
   const GOALP = [UI.goal.x + 84, UI.goal.y + UI.goal.h / 2];                   // where goal tiles land (the panel's icon)
   const HERO = [W * 0.5, H * 0.80];                                            // shelter hero: centre x, bottom y [ART]
-  const WIN = [W * Z.patchAt[0], H * Z.patchAt[1]];                            // the broken window [ART]
   let OX = 0, OY = 0;                                                          // trauma shake of the world this frame
   S.hit = [];
 
   // sprite helpers (view px)
+  const cov = (n) => { const tx = G.tex(n), k = Math.max(W / tx.w, H / tx.h) * 1.05; return { k, x0: (W - tx.w * k) / 2, y0: (H - tx.h * k) / 2, tx }; };   // cover-fit of a background
+  const imgPt = (n, fx, fy) => { const c = cov(n); return [c.x0 + fx * c.tx.w * c.k, c.y0 + fy * c.tx.h * c.k]; };                                      // image fraction → view px
   const cover = (n) => { if (!has(n)) return; const tx = G.tex(n), k = Math.max(W / tx.w, H / tx.h) * 1.05, w = tx.w * k, h = tx.h * k; L.sprite(n, (W - w) / 2 + OX, (H - h) / 2 + OY, { w, h }); };
   const spr = (n, cx, cy, w, h, o = {}) => { if (!has(n)) return; const s = o.s === undefined ? 1 : o.s, sx = (o.sx || 1) * s, sy = (o.sy || 1) * s; if (s <= 0.01) return;
-    if (!w) w = L.hsz(n, h); if (!h) h = w * G.tex(n).h / G.tex(n).w; L.sprite(n, cx - w * sx / 2, cy - h * sy / 2, { w: w * sx, h: h * sy, u: { alpha: o.a === undefined ? 1 : o.a } }); };
-  const hero = (n, cx, bottom, a = 1) => { if (!has(n) || a <= 0.003) return; const h = Z[n][1], w = L.hsz(n, h); L.sprite(n, cx - w / 2 + OX, bottom - h + OY, { w, h, u: { alpha: a } }); };
+    const tw = G.tex(n).w, th = G.tex(n).h; if (w && h) { const f = Math.min(w / tw, h / th); w = tw * f; h = th * f; }      // both given = fit inside the box, aspect kept
+    if (!w) w = L.hsz(n, h); if (!h) h = w * th / tw; L.sprite(n, cx - w * sx / 2, cy - h * sy / 2, { w: w * sx, h: h * sy, u: { alpha: o.a === undefined ? 1 : o.a } }); };
+  const hero = (n, cx, bottom, a = 1) => { if (!has(n) || a <= 0.003) return; const h = Z[n][1] || L.sz(n, Z[n][0] / G.tex(n).w)[1], w = Z[n][0] || L.hsz(n, h); L.sprite(n, cx - w / 2 + OX, bottom - h + OY, { w, h, u: { alpha: a } }); };
   const panel = (slot, x, y, w, h, c0, c1, a = 0.85) => { L.rrect(x, y, w, h, Math.min(h / 2, 40), c0, c1, a); L.uiBox(slot, x, y, w, h, 4); };
   const bubble = (x, y, r, a, hot = 1, tail = null) => { L.glow(x, y, r * 1.55, [1, 0.95, 0.5], 0.35 * a * hot, 2.2);
     if (tail) { const an = Math.atan2(tail[1] - y, tail[0] - x), tx = x + Math.cos(an) * r * 0.92, ty = y + Math.sin(an) * r * 0.92; L.solid(tx - r * 0.2, ty - r * 0.2, r * 0.4, r * 0.4, [1, 1, 1], an + Math.PI / 4, r * 0.2, r * 0.2, a); }
     L.rrect(x - r, y - r, 2 * r, 2 * r, r, [1, 1, 1], [0.86, 0.9, 1], a); };
   const lock = (x, y, a) => { L.rrect(x - 26, y - 6, 52, 42, 10, [0.98, 0.8, 0.25], [0.85, 0.6, 0.12], a); L.ring(x, y - 10, 17, 20, [0.85, 0.87, 0.95], a, 0.22); L.solid(x - 4, y + 8, 8, 14, [0.3, 0.2, 0.05], 0, 0, 0, a); };
   const handAt = (hx, hy, down) => { if (down) L.glow(hx, hy, 70, [1, 1, 1], 0.35, 2.5);
-    if (has('hand')) { const hh = Z.hand[1] * (down ? 0.92 : 1), hw = L.hsz('hand', hh); L.sprite('hand', hx - hw * 0.33, hy - hh * 0.03, { w: hw, h: hh }); }
+    if (has('hand')) { const hh = Z.hand[1] * (down ? 0.92 : 1), hw = L.hsz('hand', hh); L.sprite('hand', hx - hw * 0.086, hy - hh * 0.01, { w: hw, h: hh }); }
     else { L.rrect(hx - 34, hy - 34, 68, 68, 34, [1, 1, 1], [0.86, 0.86, 0.9], 0.9); L.ring(hx, hy, 52, 52, [1, 1, 1], down ? 0.8 : 0.3, 0.12); } };
   const caption = (slot, txt, y, a = 1) => { const tw = L.labelW(slot, txt, { size: 58, font: FONT });
     panel(slot, W / 2 - tw / 2 - 44, y - 56, tw + 88, 112, [0.06, 0.08, 0.16], [0.03, 0.04, 0.10], 0.78 * a);
@@ -47,12 +49,12 @@
     L.beginBG([0.1, 0.12, 0.2, 1]);
     if (!shelter) {                                                              // shot A: the door slams, she is left in the snow
       cover('bg_outside');
-      const open = 1 - ease(clamp((GT - 0.45) / 0.25, 0, 1)), sx = 0.15 + 0.85 * (1 - open), dh = Z.door[1], dw = has('door') ? L.hsz('door', dh) : 300, dl = W * 0.5, db = H * 0.62;
-      L.glow(dl + dw * 0.4 + OX, db - dh * 0.45 + OY, 620 * (0.35 + 0.65 * open), [1, 0.8, 0.4], 0.5 * open, 2.2);         // warm light that dies with the door
-      L.glow(dl + dw * 0.1 + OX, db + 40 + OY, 420 * open, [1, 0.75, 0.35], 0.4 * open, 2.4);
-      if (has('door')) L.sprite('door', 0, 0, { m: M.of(M.t(dl + OX, db + OY), M.s(sx, 1)), w: dw, h: dh, pivot: [0, dh] });
-      const u = ease(clamp((GT - 0.5) / 0.7, 0, 1));                             // she is thrown out and slides onto the snow
-      hero('hero_snow', dl + dw * 0.3 + (W * 0.3 - dl - dw * 0.3) * u, H * 0.74 - 50 * Math.sin(Math.PI * u), SS(0.4, 0.8, GT));
+      const open = 1 - ease(clamp((GT - 0.45) / 0.25, 0, 1)), sx = 0.15 + 0.85 * (1 - open), [dl, dt] = imgPt('bg_outside', Z.doorBox[0], Z.doorBox[1]), [dr, db] = imgPt('bg_outside', Z.doorBox[2], Z.doorBox[3]), dw = (dr - dl) * 1.04, dh = db - dt;
+      L.glow((dl + dr) / 2 + OX, (dt + db) / 2 + OY, 700 * (0.35 + 0.65 * open), [1, 0.8, 0.4], 0.5 * open, 2.2);              // warm light that dies with the door
+      L.glow((dl + dr) / 2 + OX, db + 60 + OY, 480 * open, [1, 0.75, 0.35], 0.4 * open, 2.4);
+      if (has('door')) L.sprite('door', 0, 0, { m: M.of(M.t(dl - dw * 0.02 + OX, db + OY), M.s(sx, 1)), w: dw, h: dh, pivot: [0, dh] });
+      const u = ease(clamp((GT - 0.5) / 0.7, 0, 1)), hb = db + (H * 0.80 - db) * u - 70 * Math.sin(Math.PI * u);                // she is thrown out and slides onto the snow
+      hero('hero_snow', (dl + dr) / 2 + (W * 0.40 - (dl + dr) / 2) * u, hb, SS(0.4, 0.8, GT));
       for (let i = 0; i < 16; i++) { const x = ((rnd(i, 9) * 1.5 * W - GT * 1100 * (0.6 + rnd(i, 8))) % (1.5 * W) + 1.5 * W) % (1.5 * W) - 0.2 * W;
         L.solid(x, rnd(i, 7) * H, 140 * (0.5 + rnd(i, 6)), 3, [1, 1, 1], -0.12, 0, 0, 0.3); }       // blizzard streaks
     } else {                                                                     // shot B: the shelter
@@ -61,9 +63,10 @@
       hero('hero_sad', cx, bot, sad);
       if (reveal && choice === 'comb') hero('hero_happy', cx, bot, SS(0.5, 1.1, rt));
       if (reveal && choice === 'dress') hero('hero_dress', cx, bot, SS(0.5, 1.1, rt));
-      if (reveal && choice === 'window') spr('window_patch', WIN[0] + OX, WIN[1] + OY, Z.window_patch[0], 0, { a: SS(0.5, 1.1, rt) });
-      if (!reveal) for (let j = 0; j < 3; j++) { const q = (GT * 0.9 + j / 3) % 1; L.puff(cx - 20 + 25 * q, bot - 640 - 90 * q, 14 + 28 * q, [1, 1, 1], 0.4 * (1 - q), j + 60); }   // breath puffs [ART: at her mouth]
-      if (!reveal || rt < 1) for (let j = 0; j < 14; j++) { const y = WIN[1] + 60 + (GT * 95 * (0.5 + rnd(j, 5)) + rnd(j, 6) * 600) % 640; L.puff(WIN[0] + (rnd(j, 4) - 0.5) * 280 + 30 * Math.sin(GT + j), y, 7 + 5 * rnd(j, 3), [1, 1, 1], 0.5 * (1 - warm), j + 80); }   // snow through the window
+      if (reveal && choice === 'window' && has('window_patch')) { const [px0, py0] = imgPt('bg_room', Z.patchRect[0], Z.patchRect[1]), [px1, py1] = imgPt('bg_room', Z.patchRect[2], Z.patchRect[3]);
+        L.sprite('window_patch', px0 + OX, py0 + OY, { w: px1 - px0, h: py1 - py0, u: { alpha: SS(0.5, 1.1, rt) } }); }
+      if (!reveal) for (let j = 0; j < 3; j++) { const q = (GT * 0.9 + j / 3) % 1; L.puff(cx - 20 + 25 * q, bot - 655 - 90 * q, 14 + 28 * q, [1, 1, 1], 0.4 * (1 - q), j + 60); }   // breath puffs [ART: at her mouth]
+      if (!reveal || rt < 1) for (let j = 0; j < 14; j++) { const WIN = imgPt('bg_room', Z.winAt[0], Z.winAt[1]), y = WIN[1] + 60 + (GT * 95 * (0.5 + rnd(j, 5)) + rnd(j, 6) * 600) % 640; L.puff(WIN[0] + (rnd(j, 4) - 0.5) * 280 + 30 * Math.sin(GT + j), y, 7 + 5 * rnd(j, 3), [1, 1, 1], 0.5 * (1 - warm), j + 80); }   // snow through the window
     }
     for (let i = 0; i < 36; i++) { const drift = shelter ? 40 : 160, x = (rnd(i, 1) * W + drift * Math.sin(GT * 0.8 + i) + (shelter ? 0 : GT * 160 * rnd(i, 2))) % W, y = (GT * 130 * (0.5 + rnd(i, 2)) + rnd(i, 3) * H) % H;
       L.puff(x, y, 6 + 6 * rnd(i, 4), [1, 1, 1], 0.5 * (1 - 0.9 * warm), i); }

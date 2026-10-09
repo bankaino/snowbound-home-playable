@@ -1,0 +1,4 @@
+Use case: story shot sprite of the heroine thrown out into the cold (transparent canvas, drawn over a snowy background).
+Subject: the SAME character as Image 2 (same face, auburn braid, mustard knit sweater, rolled blue jeans, bare feet; use Image 2 only for her design), now lying on her side in deep snow after falling, one arm clutching the baby in the pale-blue blanket to her chest, the other hand pressed into the snow, looking back over her shoulder with a frightened, tearful expression, hair wind-blown, snow clinging to her sweater and hair, a small pile of snow around her body.
+Composition: side view, the whole body from head to bare feet visible, wide horizontal pose, filling about 90% of the canvas width, margin all round, centred.
+Constraints: one character group only, no background, no door, no shadow plane, no text.

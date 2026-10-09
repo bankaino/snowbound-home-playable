@@ -1,0 +1,4 @@
+Use case: door sprite that swings shut in a mobile story ad (transparent canvas).
+Subject: a single old wooden front door seen FLAT from the front (no perspective), rectangular with an arched top, painted dusty blue-green with chipped paint, four small ice-blue glass panes in a 2x2 grid in the upper part with warm golden light #ffb347 glowing faintly through them, a brass round knob on the RIGHT side, dark iron hinges on the LEFT edge, a patch of frost and snow on the top edge. The door fills the canvas almost completely, left-right straight edges.
+Composition: door centred, filling about 95% of the canvas height, aspect about 0.55 (tall), margin all round.
+Constraints: only the door, no wall, no frame, no ground, no shadow, no text.

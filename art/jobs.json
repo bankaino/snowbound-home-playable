@@ -1,0 +1,9 @@
+[
+ {"name": "bg_room", "prompt": "bg_room.txt", "size": "1024x1536"},
+ {"name": "hero_sad", "prompt": "hero_sad.txt", "size": "1024x1024"},
+ {"name": "tiles_a_sheet", "prompt": "tiles_a_sheet.txt", "size": "1536x1024", "ref": ["study/ref/4_match3.png=tile art style reference only, not content"]},
+ {"name": "tiles_b_sheet", "prompt": "tiles_b_sheet.txt", "size": "1536x1024", "ref": ["study/ref/4_match3.png=tile art style reference only, not content"]},
+ {"name": "bg_outside", "prompt": "bg_outside.txt", "size": "1024x1536", "ref": ["study/ref/1_kicked_out.png=mood and rendering reference for the snowy exterior only"]},
+ {"name": "door", "prompt": "door.txt", "size": "1024x1536"},
+ {"name": "hand", "prompt": "hand.txt", "size": "1024x1024"}
+]

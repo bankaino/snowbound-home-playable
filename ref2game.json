@@ -6,7 +6,8 @@
   "quality": "high",
   "opaque": [
    "bg_*",
-   "*_tex"
+   "*_tex",
+   "window_patch"
   ]
  },
  "style_bible": "art/style_bible.txt",
@@ -23,7 +24,8 @@
   "manifest": "live/assets.js",
   "notrim": [
    "bg_*",
-   "*_tex"
+   "*_tex",
+   "window_patch"
   ],
   "skip": [
    "*_sheet",

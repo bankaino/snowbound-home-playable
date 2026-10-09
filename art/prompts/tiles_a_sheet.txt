@@ -1,0 +1,4 @@
+Use case: three match-3 board tile icons for a mobile game (glossy casual-game style like the tile art in Image 2).
+Subject: three separate glossy icons in one horizontal row: (1) a green heart-shaped leaf with a lighter central vein, saturated green #3cb043, plump and shiny; (2) a round gold coin with an embossed star in the centre and a thicker rim, #f5c21b with warm highlights; (3) a plump ball of red wool yarn with visible wound strands and a loose end curling out, #e0383e. Each icon is chunky and readable at small size, a soft darker-tone edge instead of a black outline, one white specular highlight, a soft darker underside.
+Composition: the three icons in a single horizontal row, same size, each centred in its third of the canvas with very wide empty gaps (at least 25% of the canvas width) between them, nothing touching, generous margin to the canvas edges.
+Constraints: exactly three icons, no ground, no shadows, no text, no other objects.

@@ -1,0 +1,4 @@
+Use case: alternative payoff sprite of the same character in a new dress (transparent canvas, drawn over the same background).
+Edit of Image 2: keep EXACTLY the same armchair, pose, framing, canvas placement, size, face, hair, baby and blanket; change ONLY her clothes: the mustard knit sweater and jeans become a flowing raspberry-pink #e8508a dress with short puffed sleeves, a white collar and a gathered skirt covering her knees (matching the pink dress icon), still with bare feet; her expression becomes a relieved gentle smile and the snow on her and on the armchair is gone.
+Composition: identical to Image 2 (same canvas placement, same scale).
+Constraints: one character group only, no background, no ground, no shadow, no text.
