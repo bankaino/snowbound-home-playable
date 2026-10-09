@@ -1,0 +1,7 @@
+{
+ "hypothesis": "Old idle behaviour: no freezing; a viewer who does nothing gets the comb auto-picked after 4 s and sees the unplayed board (and the endcard at 14 s). Tests 'seeing the game' against 'seeing Mia freeze' for the passive cohort.",
+ "K": {
+  "AUTO_PICK": 4,
+  "FROST_AT": 99
+ }
+}

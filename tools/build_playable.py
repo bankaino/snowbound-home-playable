@@ -88,7 +88,7 @@ def build(variant, nets, out):
     if missing: print('  ! scene.js uses textures not listed in tools/build.json: ' + ', '.join(missing)); return False
     vfile = os.path.join(ROOT, 'variants', variant + '.json')
     over = json.load(open(vfile)) if os.path.exists(vfile) else {}
-    mods = ['sizes.js', 'gl.js', 'lib.js', 'batch.js', 'sim.js', 'scene.js', 'audio.js']
+    mods = ['sizes.js', 'font.js', 'gl.js', 'lib.js', 'batch.js', 'sim.js', 'scene.js', 'audio.js']
     code = '\n'.join(js_min(open(os.path.join(LIVE, m), encoding='utf-8').read()) for m in mods)
     # variant overrides land right after sim.js defines SIM (before scene.js reads it)
     vjs = f"Object.assign(SIM.K, {json.dumps(over.get('K', {}))}); window.VARIANT = {json.dumps(dict(over, name=variant))};"

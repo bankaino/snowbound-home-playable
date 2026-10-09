@@ -1,0 +1,4 @@
+Use case: full-screen frost overlay for a mobile game ad (transparent PNG drawn on top of the scene when the heroine is freezing).
+Subject: delicate translucent frost and ice crystals growing inward from ALL FOUR EDGES and the four corners of the canvas: fern-like ice patterns, frozen window-glass frost, tiny snowflakes, soft white-blue #dff2ff with bright sparkling crystal highlights; the frost is densest in the corners and thins out toward the middle.
+Composition: portrait 2:3; the central 60% of the canvas (both width and height) is completely transparent so the scene shows through; the frost frames it evenly on all sides.
+Constraints: no text, no objects, no people, no solid background, no border line, only the frost.

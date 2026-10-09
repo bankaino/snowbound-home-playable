@@ -177,6 +177,15 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
       Old Timber Rush variants deleted. `verify.sh all` = VERIFY OK for all 7 (1.24 MB each, google 0.89, meta under 2 MB, 61 fps).
       README.md = the case study (flow, workflow, measured numbers, variants, build/test commands, repo map, honest gaps).
       Headless demo per variant: GOAL 9 win 13.4/end 17.2 s; STORY 0 win 4.5/end 8.2 s; PICK dress win 6.7/end 10.4 s.
+## Phase 5b (2026-10-09, user feedback: idle viewers + font)
+- User decisions: do NOT publish yet (play it locally first); store links stay placeholders; font download allowed → Lilita One (OFL) inlined
+  as live/font.js (TTF base64, font-weight range so 'bold' uses the real glyphs), index.html awaits FONT_READY, licenses/OFL-LilitaOne.txt.
+- Idle viewers (user idea): NO auto-solve, NO auto-pick (K.AUTO_PICK 0). After K.FROST_AT=6 s without input Mia freezes: S.frost rises over
+  K.FROST_T=6 s (thaws at 1.5/s on touch), scene = hero_frozen cross-fade + frost_frame edges + stronger shiver + wind + captions
+  ("SHE IS FREEZING! TAP!" / "HURRY! SHE IS FREEZING!"), events chill/freeze, then endWhy 'frozen' (headline "MIA IS FREEZING!", hero_frozen).
+  Passive viewer: chill 8.2 s, endcard 14.6 s. Variants auto_pick (old behaviour) and frost_fast (4 s / 5 s) added. 9 variants total.
+- Assets: hero_frozen (edit of hero_sad: frost only), frost_frame (transparent frost border, 640 px). Build 1.63 MB (Meta 2 MB limit ok).
+
 - [ ] 6. PUBLISH — ASK THE USER FIRST: public repo `bankaino/snowbound-home-playable` + Pages from /docs
       (`python tools/build_playable.py --variant all --pages docs`). Never push study/ref or reference frames.
 

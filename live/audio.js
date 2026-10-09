@@ -33,6 +33,8 @@
     goal: (t0, e) => { const d = t0 + 0.55 + 0.05 * (e.n % 6); tone(1568, d, 0.18, 'sine', 0.09); tone(2093, d + 0.05, 0.25, 'sine', 0.06); },   // lands when the tile reaches the panel
     blast: (t0) => { tone(220, t0, 0.3, 'sawtooth', 0.1, 5); burst(t0, 0.35, 5000, 400, 0.22, 0.8); },
     cascade: (t0, e) => [0, 1].forEach((j) => tone(PENTA[Math.min(7, 3 + e.n) - j], t0 + 0.12 + 0.07 * j, 0.25, 'square', 0.04)),
+    chill: (t0) => { tone(520, t0, 0.7, 'sine', 0.05, 0.6); burst(t0, 0.7, 7000, 3000, 0.07, 3); },                  // a cold shiver
+    freeze: (t0) => { burst(t0, 0.3, 9000, 1500, 0.3, 2); tone(2400, t0, 0.35, 'triangle', 0.08, 0.4); },           // ice cracks over her
     shuffle: (t0) => burst(t0, 0.3, 600, 3000, 0.15, 1),
     win: (t0) => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, t0 + i * 0.08, 0.3, 'triangle', 0.14)),
     reveal: (t0) => { [784, 988, 1175, 1568, 1976, 2349].forEach((f, i) => tone(f, t0 + i * 0.09, 0.4, 'sine', 0.09));        // magic swirl
@@ -47,7 +49,7 @@
       for (const e of S.ev) { if (e.t <= last) continue; if (SFX[e.k]) SFX[e.k](now, e); }
       last = S.t;
       const cold = S.end < 0 && S.phase !== 'reveal' ? 1 : S.phase === 'reveal' ? (S.choice === 'window' ? Math.max(0, 1 - (S.t - S.phaseT) / 1.2) : 1) : 0;   // wind dies when the room warms up
-      wind.g.gain.setTargetAtTime(0.06 * cold * (0.7 + 0.3 * Math.sin(S.t * 0.9)), now, 0.2); wind.f.frequency.setTargetAtTime(420 + 260 * Math.sin(S.t * 0.7), now, 0.3);
+      wind.g.gain.setTargetAtTime(0.06 * cold * (0.7 + 0.3 * Math.sin(S.t * 0.9)) * (1 + 2.5 * (S.frost || 0)), now, 0.2); wind.f.frequency.setTargetAtTime(420 + 260 * Math.sin(S.t * 0.7), now, 0.3);
     },
   };
 })();

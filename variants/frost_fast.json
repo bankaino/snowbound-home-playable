@@ -1,0 +1,7 @@
+{
+ "hypothesis": "Mia starts freezing after 4 s of no input (instead of 6) and the endcard follows 5 s later: more urgency for hesitant viewers, less time to read the wishes.",
+ "K": {
+  "FROST_AT": 4,
+  "FROST_T": 5
+ }
+}

@@ -1,0 +1,4 @@
+[
+ {"name": "hero_frozen", "prompt": "hero_frozen.txt", "size": "1024x1024", "ref": ["art/gen/hero_sad.png=edit target: same pose and armchair, only frost and freezing"]},
+ {"name": "frost_frame", "prompt": "frost_frame.txt", "size": "1024x1536"}
+]

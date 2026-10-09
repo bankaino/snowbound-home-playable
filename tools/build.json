@@ -76,6 +76,14 @@
     "hero_dress_smile": [
       720,
       "alpha"
+    ],
+    "hero_frozen": [
+      720,
+      "alpha"
+    ],
+    "frost_frame": [
+      640,
+      "alpha"
     ]
   }
 }

@@ -9,9 +9,10 @@
   const K = {
     COLS: 5, ROWS: 6, CELL: 170, GOAL: 6, GOAL_BIAS: 0.30, GOAL_MIN: 3,        // grid, goal count, refill bias, min goal tiles kept on the board
     SWIPE_PX: 60, SWAP_T: 0.14, CLEAR_T: 0.18, FALL_G: 5200, BOUNCE: 0.22,
-    INTRO_CUT: 1.2, INTRO_END: 2.2, AUTO_PICK: 2.5, BOARD_IN: 0.7, HAND_IDLE: 2.5, WIN_DELAY: 0.35, REVEAL_T: 3.4,
+    INTRO_CUT: 1.2, INTRO_END: 2.2, AUTO_PICK: 0, BOARD_IN: 0.7, HAND_IDLE: 2.5, WIN_DELAY: 0.35, REVEAL_T: 3.4,
     PICK: 'comb', SMILE: 1, BAD_HINT: 2, STORY: 1, DEMO_PICK_AFTER: 1.3,                                         // hand + auto-pick target (A/B), faint smile in the final frames (A/B), bad swaps before the hand shows up
-    END_MAX: 22, END_NO_INPUT: 14, END_IDLE: 10,
+    END_MAX: 22, END_NO_INPUT: 16, END_IDLE: 14,
+    FROST_AT: 6, FROST_T: 6, FROST_HOLD: 0.4, FROST_REC: 1.5,                    // idle for 6 s → Mia starts to freeze (frost creeps in over 6 s) → 'frozen' endcard; any touch thaws her
     DEMO_THINK: 0.55, DEMO_SWIPE: 0.4,
   };
   const N = K.COLS * K.ROWS, GOALK = 3;                                         // tile kinds: 0 leaf, 1 coin, 2 yarn, 3 GOAL (comb | window | dress)
@@ -62,7 +63,7 @@
     return { cells, busy: 'in', t0: S.t, readyAt: S.t + K.BOARD_IN, sw: null, casc: 0, idleSince: -9, best: null };
   }
   function create() {
-    return { t: 0, steps: 0, wt0: 0, ev: K.STORY ? [] : [{ k: 'intro_cut', t: 0 }, { k: 'bubbles', t: 0 }], phase: K.STORY ? 'intro' : 'choice', phaseT: 0, cut: K.STORY ? -1 : 0, choice: '', auto: false, bd: null, got: 0, money: 0, earned: 0, moves: 0,
+    return { t: 0, steps: 0, wt0: 0, ev: K.STORY ? [] : [{ k: 'intro_cut', t: 0 }, { k: 'bubbles', t: 0 }], phase: K.STORY ? 'intro' : 'choice', phaseT: 0, cut: K.STORY ? -1 : 0, frost: 0, frostFull: -1, chilled: false, actT: K.STORY ? -1 : 0, choice: '', auto: false, bd: null, got: 0, money: 0, earned: 0, moves: 0,
       end: -1, endWhy: '', winT: -9, firstIn: -1, lastIn: 0, prevPress: false, drag: null, sel: -1, rs: 20241009, nid: 0 };
   }
   const spawn = (worldT) => Object.assign(create(), { wt0: worldT });
@@ -144,7 +145,7 @@
   const endGame = (S, why) => { S.end = S.t; S.endWhy = why; S.ev.push({ k: 'end', t: S.t, why }); };
   function toChoice(S) {
     if (S.cut < 0) { S.cut = S.t; S.ev.push({ k: 'intro_cut', t: S.t }); }
-    S.phase = 'choice'; S.phaseT = S.t; S.ev.push({ k: 'bubbles', t: S.t });
+    S.phase = 'choice'; S.phaseT = S.actT = S.t; S.ev.push({ k: 'bubbles', t: S.t });
   }
 
   function step(S, inp) {
@@ -161,10 +162,16 @@
     } else if (S.phase === 'choice') {
       let pick = '';
       if (edge && t - S.phaseT > 0.2) for (const n of UI.ORDER) { const b = UI.bubbles[n]; if (Math.hypot(inp.px - b.x, inp.py - b.y) <= b.r + 20) { pick = n; break; } }
-      const auto = !pick && t - Math.max(S.phaseT, S.lastIn) > K.AUTO_PICK;      // nobody tapped: the comb is chosen so a passive viewer still sees the game
+      const auto = K.AUTO_PICK > 0 && !pick && t - Math.max(S.phaseT, S.lastIn) > K.AUTO_PICK;      // nobody tapped: the comb is chosen so a passive viewer still sees the game
       if (pick || auto) { S.choice = pick || K.PICK; S.auto = auto; S.phase = 'board'; S.phaseT = t; S.bd = createBoard(S); S.ev.push({ k: 'choose', t, kind: S.choice, auto }); }
     } else if (S.phase === 'board') stepBoard(S, inp, edge, rel, press);
     else if (S.phase === 'reveal' && t - S.phaseT >= K.REVEAL_T) endGame(S, 'win');
+    if (S.end < 0 && S.actT >= 0 && (S.phase === 'choice' || (S.phase === 'board' && S.bd.busy !== 'won'))) {          // nobody touching: she freezes
+      const idle = t - Math.max(S.lastIn, S.actT), cold = idle > K.FROST_AT;
+      S.frost = Math.max(0, Math.min(1, S.frost + (cold ? DT / K.FROST_T : -DT * K.FROST_REC)));
+      if (cold && !S.chilled) { S.chilled = true; S.ev.push({ k: 'chill', t }); } else if (!cold && S.frost <= 0) S.chilled = false;
+      if (S.frost >= 1) { if (S.frostFull < 0) { S.frostFull = t; S.ev.push({ k: 'freeze', t }); } else if (t - S.frostFull > K.FROST_HOLD) endGame(S, 'frozen'); } else S.frostFull = -1;
+    }
     if (S.end < 0 && S.phase !== 'reveal' && !(S.bd && S.bd.busy === 'won')) {
       const why = S.firstIn >= 0 && t - S.firstIn > K.END_MAX ? 'time' : S.firstIn < 0 && t > K.END_NO_INPUT ? 'time' : S.firstIn >= 0 && t - S.lastIn > K.END_IDLE ? 'time' : '';
       if (why) endGame(S, why);

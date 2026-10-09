@@ -1,0 +1,4 @@
+Use case: story sprite shown when the player does nothing and the heroine is freezing (transparent canvas, drawn over the same background).
+Edit of Image 2: keep the same armchair, pose, canvas placement, scale, face identity, messy auburn hair, mustard knit sweater, jeans, bare feet, baby and blanket. Change ONLY how cold she is: her skin is pale blue-white with bluish lips, frost and tiny ice crystals cover her hair, eyelashes, sweater and the baby's blanket, small icicles hang from her hair ends and from the armchair arms, a thick cloud of white breath, her eyes are squeezed shut and she grimaces with chattering teeth, the baby is also frosted. She is clearly freezing but still a friendly cartoon character (not scary, no horror).
+Composition: identical to Image 2 (same canvas placement, same scale).
+Constraints: one character group only, no background, no ground, no shadow, no text.
