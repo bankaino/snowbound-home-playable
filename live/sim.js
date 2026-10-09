@@ -82,7 +82,8 @@
     for (let i = 0; i < N; i++) if (m.mark[i]) { const c = bd.cells[i]; c.clr = t;
       if (c.k === GOALK) { ng++; S.got++; S.money = S.earned = S.got; const [x, y] = cellXY(i); S.ev.push({ k: 'goal', t, x, y, n: S.got, i }); } }
     const [cx, cy] = centre(S, m.mark);
-    S.ev.push({ k: 'match', t, n: m.n, ng, casc: bd.casc, x: cx, y: cy });
+    const idx = [], kk = []; for (let i = 0; i < N; i++) if (m.mark[i]) { idx.push(i); kk.push(bd.cells[i].k); }   // for the scene's sparkles
+    S.ev.push({ k: 'match', t, n: m.n, ng, casc: bd.casc, x: cx, y: cy, idx, kk });
     for (const b of m.blasts) S.ev.push({ k: 'blast', t, row: b.row, col: b.col, x: b.row !== undefined ? W / 2 : cellXY(b.col)[0], y: b.row !== undefined ? cellXY(b.row * K.COLS)[1] : BY + GH / 2 });
     if (bd.casc > 1) S.ev.push({ k: 'cascade', t, n: bd.casc, x: cx, y: cy });
     bd.busy = 'clear'; bd.t0 = t;
@@ -151,6 +152,7 @@
     if (press) { S.lastIn = t; if (S.firstIn < 0) S.firstIn = t; }
     if (S.end >= 0) return S;
     if (S.phase === 'intro') {
+      if (!S.slam && t >= 0.7) { S.slam = 1; S.ev.push({ k: 'slam', t }); }       // the door shuts (scene: shake, audio: thud)
       if (S.cut < 0 && t >= K.INTRO_CUT) { S.cut = t; S.ev.push({ k: 'intro_cut', t }); }
       if (edge || t >= K.INTRO_END) toChoice(S);                                 // any tap skips the story
     } else if (S.phase === 'choice') {

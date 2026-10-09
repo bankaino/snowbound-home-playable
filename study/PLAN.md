@@ -122,9 +122,20 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
         blast cascade goal win reveal end shuffle. Cell kind 3 = goal tile (texture by S.choice).
       verify.sh: VERIFY OK (qa 9 states, 0.13 MB per network, 61 fps, smoke goal 7/6). Headless checks done: skip intro by tap,
       bad swap + restore, tap-select swap, idle → endcard at 13 s, JSON round-trip of state.
-- [ ] 2. SCENE on placeholders: intro shots + cut, hero stack, bubbles, board + tiles (BATCH), goal panel, reveal +
-      tint, HUD/CTA/endcard, juice per verb (instant: squash/shake/flash · short: sparkles, fly-to-panel, sound ·
-      long: cleared cells glow briefly, room stays warm), audio.js sounds. `verify.sh` green. Commit.
+- [x] 2. DONE 2026-10-09 (Sonnet 5.5). scene.js rewritten (still placeholder sprites), audio.js rewritten. verify.sh OK
+      (qa 13 states incl. window/dress reveals, 0.13 MB, 61 fps). Contact sheet of 8 beats checked once (frames/g, ignored).
+      Done: intro A (door slam via matrix scaleX + camera shake, warm light that dies with the door, hero_snow slides in, blizzard
+      streaks), whip flash cut, shelter B (shiver, breath puffs, snow through the window, cold grade), bubbles with tails + pop-in
+      + hand on comb, chosen bubble flies to the goal panel with sparkles, board frame + checker cells, tile-coloured sparkles per
+      cleared tile (match event carries idx/kk), line-blast beam + shake, landing squash, goal-tile breathing, goal fly with arc +
+      trail + panel pop, counter counts landed tiles, new tiles fade in at the frame top (no scissor), callouts SWEET!/GREAT!/
+      AMAZING!, reveal (swirl of stars, warm grade + glow, cross-fade sad→happy|dress or window_patch, locked bubbles + "SHE NEEDS
+      MORE..."), endcard (headline by endWhy, hero, sparkles, stat, whole-screen CTA, replay).
+      sim got events `slam` (t=0.7) and match.idx/kk. audio.js: wind loop (dies on reveal), slam thud, whip, 3 pops, choose, swap
+      whoosh, bad thunk, pentatonic match chime by cascade, goal ding on landing, blast zap, cascade, shuffle, win, reveal swirl +
+      giggle, end. Not listened to on a real device.
+      [ART] tuning for phase 3 (constants at the top of scene.js / sizes.js): HERO centre/bottom, WIN (window position = SIZES.patchAt),
+      breath puff position (bot - 640), door left x/bottom, hero_snow slide path, Z.* display sizes, bubble positions in SIM.UI.
 - [ ] 3. ART (Gate A): art/style_bible.txt (≤ 6 lines, measured from study/ref: palette hex, outline weight, shading
       steps, light direction, exclusions "no text, no logos, no UI frames") → one prompt per asset in art/prompts/ →
       art/jobs.json (bg_* with "size": "1024x1536") → batch 1: bg_room, hero_sad, tiles_sheet; check ONE contact sheet
