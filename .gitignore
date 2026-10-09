@@ -1,0 +1,11 @@
+study/ref/
+study/crops/
+ref.png
+frames/
+art/raw/
+art/logs/
+art/placeholder/
+art/jobs.json.resolved.json
+*.resolved.json
+dist/
+node_modules/
