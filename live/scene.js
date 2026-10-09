@@ -3,7 +3,7 @@
 // finish → persistent CTA bar → endcard. Sprites are placeholders until phase 3; positions marked [ART] are tuned once the art exists.
 (function () {
   const S = (window.SCENE = {}), A = window.ASSETS, L = LIB, M = L.M, W = SIM.VIEW.W, H = SIM.VIEW.H, Z = window.SIZES, K = SIM.K, UI = SIM.UI, SS = L.SS;
-  S.programs = () => { L.init(W, H); };
+  S.programs = () => { L.init(W, H); BATCH.init(['tile_leaf', 'tile_coin', 'tile_yarn', 'tile_comb', 'tile_window', 'tile_dress']); };   // all 30 board tiles = one instanced draw
   const has = (n) => !!A[n];
   const FONT = '"Arial Black", "Arial Rounded MT Bold", "Segoe UI Black", sans-serif';
   const ease = (x) => 1 - (1 - x) * (1 - x), clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -75,9 +75,9 @@
       if (reveal && choice === 'window' && has('window_patch')) { const [px0, py0] = imgPt('bg_room', Z.patchRect[0], Z.patchRect[1]), [px1, py1] = imgPt('bg_room', Z.patchRect[2], Z.patchRect[3]);
         const [x1, y1, w1, h1] = zr(px0 + OX, py0 + OY, px1 - px0, py1 - py0); L.sprite('window_patch', x1, y1, { w: w1, h: h1, u: { alpha: SS(0.5, 1.1, rt) } }); }
       if (!(reveal && win)) for (let j = 0; j < 3; j++) { const q = (GT * 0.9 + j / 3) % 1; L.puff(cx - 20 + 25 * q, bot - 655 - 90 * q, 14 + 28 * q, [1, 1, 1], 0.4 * (1 - q), j + 60); }   // breath puffs [ART: at her mouth]
-      if (snowOn > 0.01) for (let j = 0; j < 14; j++) { const WIN = imgPt('bg_room', Z.winAt[0], Z.winAt[1]), y = WIN[1] + 60 + (GT * 95 * (0.5 + rnd(j, 5)) + rnd(j, 6) * 600) % 640; L.puff(WIN[0] + (rnd(j, 4) - 0.5) * 280 + 30 * Math.sin(GT + j), y, 7 + 5 * rnd(j, 3), [1, 1, 1], 0.5 * snowOn, j + 80); }   // snow through the window
+      if (snowOn > 0.01 && bq < 0.9) for (let j = 0; j < 14; j++) { const WIN = imgPt('bg_room', Z.winAt[0], Z.winAt[1]), y = WIN[1] + 60 + (GT * 95 * (0.5 + rnd(j, 5)) + rnd(j, 6) * 600) % 640; L.puff(WIN[0] + (rnd(j, 4) - 0.5) * 280 + 30 * Math.sin(GT + j), y, 7 + 5 * rnd(j, 3), [1, 1, 1], 0.5 * snowOn, j + 80); }   // snow through the window
     }
-    for (let i = 0; i < 36; i++) { const drift = shelter ? 40 : 160, x = (rnd(i, 1) * W + drift * Math.sin(GT * 0.8 + i) + (shelter ? 0 : GT * 160 * rnd(i, 2))) % W, y = (GT * 130 * (0.5 + rnd(i, 2)) + rnd(i, 3) * H) % H;
+    for (let i = 0; i < (bq > 0.9 ? 10 : 36); i++) { const drift = shelter ? 40 : 160, x = (rnd(i, 1) * W + drift * Math.sin(GT * 0.8 + i) + (shelter ? 0 : GT * 160 * rnd(i, 2))) % W, y = (GT * 130 * (0.5 + rnd(i, 2)) + rnd(i, 3) * H) % H;
       L.puff(x, y, 6 + 6 * rnd(i, 4), [1, 1, 1], 0.5 * (1 - 0.9 * (1 - snowOn)), i); }
     L.solid(0, 0, W, H, [0.05, 0.1, 0.3], 0, 0, 0, 0.16 * (1 - wg));          // the room stays cold; only a repaired window warms it a little
     L.solid(0, 0, W, H, [1.0, 0.65, 0.25], 0, 0, 0, 0.16 * wg);
@@ -110,11 +110,14 @@
         const sel = ST.sel === i ? 1.12 + 0.04 * Math.sin(GT * 12) : 1, bad = ST.ev.some((e) => e.k === 'bad' && (e.a === i || e.b === i) && GT - e.t < 0.3 && GT - e.t > K.SWAP_T) ? 8 * Math.sin(GT * 90) : 0;
         const bob = c.k === 3 && ph === 'board' ? 1 + 0.035 * Math.sin(GT * 4 + i) : 1, up = c.vy < 0, sq = c.bn || up ? 0.07 : 0;      // goal tiles breathe; landing squash
         const into = SS(UI.grid.y - 90, UI.grid.y + 30, cy + c.fy);                // new tiles fade in as they enter the frame (no scissor in the engine)
-        spr(c.k === 3 ? GOALTEX[choice] : TILE[c.k], cx + c.ox + bad + ox, cy + c.oy + c.fy + oy, Z.tile[0], Z.tile[1], { s: sel * bob * (1 + 0.3 * Math.sin(Math.PI * q * 0.5)), sx: 1 + sq, sy: 1 - sq, a: (1 - q * q) * into }); });
+        const nm = c.k === 3 ? GOALTEX[choice] : TILE[c.k], asp = BATCH.aspect(nm), bw0 = asp >= 1 ? Z.tile[0] : Z.tile[1] * asp, bh0 = bw0 / asp;     // fit inside the 150 box, aspect kept
+        const sc = sel * bob * (1 + 0.3 * Math.sin(Math.PI * q * 0.5)) * (q > 0.8 ? (1 - q) / 0.2 : 1) * into, w1 = bw0 * sc * (1 + sq), h1 = bh0 * sc * (1 - sq);   // instanced = no per-tile alpha: tiles pop out / grow in by scale
+        BATCH.add(nm, cx + c.ox + bad + ox - w1 / 2, cy + c.oy + c.fy + oy - h1 / 2, w1, h1); });
+      BATCH.flush(t);
       if (ST.sel >= 0) { const [cx, cy] = SIM.cellXY(ST.sel); L.ring(cx + ox, cy + oy, 92, 92, [1, 1, 1], 0.7, 0.08); }
       // juice per match: tile-coloured sparkles per cleared tile, line-blast beam
       for (const e of ST.ev) { const a = GT - e.t; if (a < 0 || a > 0.5) continue; const q = a / 0.5;
-        if (e.k === 'match') e.idx.forEach((ci, j) => { const [cx, cy] = SIM.cellXY(ci); sparks(cx + ox, cy + oy, q, 8, 130, e.kk[j] === 3 ? [...GCOL[choice]] : TCOL[e.kk[j]], 20, ci * 7 + e.n); });
+        if (e.k === 'match') e.idx.forEach((ci, j) => { const [cx, cy] = SIM.cellXY(ci); sparks(cx + ox, cy + oy, q, Math.max(2, Math.min(8, Math.round(44 / e.idx.length))), 130, e.kk[j] === 3 ? [...GCOL[choice]] : TCOL[e.kk[j]], 20, ci * 7 + e.n); });
         if (e.k === 'blast' && a < 0.4) { const r = 1 - a / 0.4, horiz = e.row !== undefined;                       // layered glow beam: wide soft, mid, white core
           for (const [th, al] of [[150, 0.25], [78, 0.5], [26, 1]]) { const hh = th * r;
             if (horiz) L.solid(UI.grid.x + ox - 20, e.y - hh / 2 + oy, UI.grid.w + 40, hh, [1, 0.95, 0.7], 0, 0, 0, al * r); else L.solid(e.x - hh / 2 + ox, UI.grid.y + oy - 20, hh, UI.grid.h + 40, [1, 0.95, 0.7], 0, 0, 0, al * r); }
