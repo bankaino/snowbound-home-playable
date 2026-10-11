@@ -1,5 +1,5 @@
 // display sizes in VIEW px: { name: [w, h] } — 0 = keep the texture aspect. Regenerating an asset at another
-// resolution never changes its game size (ref2game engine.md §7 "Display size vs texture size").
+// resolution never changes its game size.
 // Anchors of things painted INTO a background are image fractions [x, y] of that background (cover-fit by the scene), measured from the art.
 window.SIZES = {
   tile: [150, 150],         // a board tile fits inside this box (aspect kept) within its 170 px cell

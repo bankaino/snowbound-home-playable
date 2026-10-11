@@ -1,8 +1,6 @@
 # SNOWBOUND HOME — playable ad plan (state file: keep it current, tick boxes as you go)
 
-Skill: `ref2playable` (`<S>` = ~/.claude/skills/ref2playable, `<R>` = ~/.claude/skills/ref2game/scripts).
-Read `<S>/SKILL.md` + `<S>/references/ad-rules.md` once per session. Nothing else from ref2game unless stuck.
-Always: `export PYTHONUTF8=1 PLAYWRIGHT=<R>/node_modules/playwright`. Project root = this folder (azuregames/new).
+Tools: in-house skills (not part of this repository). Always: `export PYTHONUTF8=1`. Project root = this folder.
 Reference: study/ref/1_kicked_out → 2_shelter → 3_choice → 4_match3 (a "rescue story + match-3" ad of a real game —
 NEVER reproduce its name, logo, heroine design or UI art; same genre, beats and camera only). User replies in Russian.
 
@@ -12,7 +10,7 @@ NEVER reproduce its name, logo, heroine design or UI art; same genre, beats and 
 - Own brand "SNOWBOUND HOME" (logo = text drawn in code). Own heroine "Mia": auburn hair in one braid, mustard knitted
   sweater, jeans, barefoot; baby in a pale-blue blanket. (Ref heroine is blonde/purple — do not copy.)
 - Finale: room transforms (wow) → the other 2 bubbles pulse with a lock "SHE NEEDS MORE" → endcard. One board only.
-- HTML5 via ref2playable, single file, all networks. Own git repo in this folder; publish only after asking the user.
+- HTML5 via the in-house skills, single file, all networks. Own git repo in this folder; publish only after asking the user.
 
 ## Game (portrait 1080×H, fixed camera, no world scroll). `S.phase`: 'intro' | 'choice' | 'board' | 'reveal'
 INTRO (plays before input, any tap skips to CHOICE; caption on a dark ribbon at top):
@@ -83,7 +81,7 @@ REPLACE: sim.js entirely as the game above (phases, grid as flat array of {k, y,
   bubble pop, swap whoosh, match chime (pitch by cascade), thunk, goal ding, line-blast zap, magic swirl, giggle
   arpeggio, win fanfare. tools/build.json: title "Snowbound Home", textures below, store links (placeholders ok).
   Delete template textures/prompts not used (tree_*, harvester*, rival*, trailer*, stump, log, ground_tex).
-  After editing build.json, re-run `python <S>/scripts/new.py . --title "Snowbound Home"` — it only adds labelled
+  After editing build.json, re-run the scaffold script — it only adds labelled
   placeholders for the new texture names (never overwrites).
 
 ## Assets (name → max px, alpha|lossy) — painted casual mobile-game look (soft cel shading, clean outlines, glossy
@@ -97,13 +95,13 @@ hero_sad 720 alpha (Mia in a torn armchair, hugging the baby, messy hair, sad, f
   ONLY hair+face / ONLY clothes; same pose, chair, framing, size) ·
 hero_snow 620 alpha (Mia lying in snow on her side clutching the baby, looking back, same design — ref hero_sad) ·
 tiles_sheet → slice to tile_leaf, tile_coin, tile_yarn, tile_comb, tile_window, tile_dress 160 alpha (glossy round-ish
-  icons, same size, centred, wide gutters; `<R>/slice.py art/gen/tiles_sheet.png ... --order x`) ·
+  icons, same size, centred, wide gutters; `slice.py art/gen/tiles_sheet.png ... --order x`) ·
 window_patch 460 alpha (the broken window boarded with planks + warm curtain, matching bg_room's window — make it an
   edit of a crop of bg_room; store its x,y,w in live/sizes.js) · hand 272 (template prompt).
 Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, light wedge, snow, sparkles, beams, tint.
 
 ## Phases (one Sonnet session each; tick and note results here)
-- [x] 0. Questions answered; project created on placeholders (`new.py . --title "Snowbound Home"`), refs copied to
+- [x] 0. Questions answered; project created on placeholders (scaffold script), refs copied to
       study/ref (temp paths die with the session), template `verify.sh` = VERIFY OK (template game still in place).
 - [x] 1. DONE 2026-10-09 (Sonnet 5.5). Nested git repo (author set per repo), commits "scaffold" + "sim: story + match-3".
       sim.js rewritten: phases intro→choice→board→reveal→end, 5×6 grid as timed states (swap/back/clear/fall/refill),
@@ -117,7 +115,7 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
       · live/scene.js is a PHASE-1 PLACEHOLDER (flat shapes + coloured placeholder tiles, all phases drawn, hit areas, QA
         states, CTA bar, endcard). Phase 2 rewrites the world drawing; keep S.hit / S.QA / caption+CTA+endcard blocks.
       · art/gen holds coloured placeholders (bg_* gradients, round tiles, boxes for heroes) for ALL textures in build.json;
-        gen_batch.py moves them to art/placeholder before generating. Template textures/prompts removed (examples stay).
+        the batch generator moves them to art/placeholder before generating. Template textures/prompts removed (examples stay).
       · smoke_test.mjs now: wait 2.8 s → tap COMB → swipe SIM best move up to 3× → check S.money > 0 → tap CTA.
       · audio.js: engine drone disabled (S.p gone); sounds still the template's — phase 2 replaces them.
       · sim API for scene/tests: SIM.UI {grid, board, goal, bubbles, ORDER, cellXY, cellAt}, SIM.bestMove(kinds),
