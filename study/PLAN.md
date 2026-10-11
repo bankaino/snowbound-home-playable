@@ -39,7 +39,7 @@ BOARD (like 4_match3, room dimmed + blurred-ish via dark overlay behind it):
   the 2nd finishes. Refill = seeded RNG with K.GOAL_BIAS
   (0.30) toward goal tiles; if no move exists → reshuffle (deterministic). `bestMove(S)` (most goal tiles, then most
   tiles) drives: the idle hand (idle > 2.5 s → ghost-swipe of bestMove), scriptInput (demo) and the smoke test.
-REVEAL (~2.8 s) — EACH CHOICE CHANGES ONLY ITS OWN THING (user decision 2026-10-09, after Gate A):
+REVEAL (~2.8 s) — EACH CHOICE CHANGES ONLY ITS OWN THING (user decision 2026-10-09):
   COMB  → only her HAIR becomes neat (hero_comb = edit of hero_sad, hair only). Face still sad, sweater, snow, window: unchanged.
   DRESS → only her CLOTHES become the pink dress (hero_dress, clothes only). Hair stays messy, window stays broken.
   WINDOW → only the WINDOW is repaired (window_patch over bg_room): draft + snow through the window stop, she stops shivering,
@@ -139,12 +139,11 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
       breath puff position (bot - 640), door left x/bottom, hero_snow slide path, Z.* display sizes, bubble positions in SIM.UI.
 - [x] 3. DONE 2026-10-09 (Sonnet 5.5). Art via Codex (ChatGPT plan, no Claude tokens), 3 batches: bg_room, bg_outside, door,
       hero_sad, hand, tiles_a/b_sheet (sliced into 6 tiles) → hero_happy / hero_dress (edits of hero_sad), hero_snow (design ref),
-      window_patch (edit of art/ref/window_crop.png, feathered in PIL) → hand regenerated after the critic. verify OK, 0.91 MB per
+      window_patch (edit of art/ref/window_crop.png, feathered in PIL) → hand regenerated. verify OK, 0.91 MB per
       network (textures 16 MB → 608 KB webp), 61 fps. Style bible = art/style_bible.txt; ref.png = 2_shelter (style ref).
       Geometry now comes from the art: SIZES.doorBox (arch opening in bg_outside), winAt + patchRect (window in bg_room), all as
       image fractions → scene `imgPt()` (cover-fit aware, works on every phone aspect). hero_snow sized by width (900).
-      Gate A critic (study/critique/gateA.md): overall 5.5; art "at the reference's level", prototype feel = code-drawn polish.
-      FIXED from it: hero visible from t=0 (hook), endcard ghost removed (world hero hidden, warm overlay, app icon, stat pill),
+      FIXED: hero visible from t=0 (hook), endcard ghost removed (world hero hidden, warm overlay, app icon, stat pill),
       hero fades under the board + contact shadows (chair, hero_snow), bubble tails aim at Mia + golden rim + shadow, layered
       beam + callout above the goal panel + 2× sparks, board light-blue rim + goal panel brown rim, reveal = push-in 1.07 + bloom
       flash + window light + rising hearts, locked bubbles bigger, captions in reveal at y=190, door width 1.0×, hand regenerated
@@ -154,13 +153,12 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
       (alpha IoU 0.97) → shimmer during the 0.6 s cross-fade; fix by compositing only head/clothes onto hero_sad in prep, or regen
       with "chair pixel-identical"; (c) embed an OFL display font (Lilita One) — needs a download, ask the user; (d) real store
       URLs in tools/build.json (placeholders now); (e) 60 ms hit-stop on blast (needs a sim freeze).
-- [x] 4. DONE 2026-10-09 (Sonnet 5.5). verify.sh OK (qa 16 states, 1.24 MB per network, 61 fps), critic Gate B (study/critique/gateB.md,
-      overall 7/10; hook 7, clarity 8, juice 7, economy 7, payoff-per-choice 6 — comb weakest, window/dress 8).
+- [x] 4. DONE 2026-10-09 (Sonnet 5.5). verify.sh OK (qa 16 states, 1.24 MB per network, 61 fps).
       MEASURED (tools/player_policies.js, tools/perf_probe.mjs): valid-move and bad-first-move players win in 8.5 s median / 12 p90 / 15.6 max
       (30/30); slow player (3 s per move) wins at 16 s; tap-bubble-then-idle → endcard 13.2 s; passive viewer → endcard 14.0 s; blind
       swipers (82 % of pairs invalid) win 6/30, endcard ≤ 28.7 s. Perf: board tiles instanced via BATCH (all 30 = 1 draw): draws board idle
       122 → 53, clear+fall 173 → 104; at 4× CPU throttle clear+fall 53.6 → 58.2 fps; no console errors.
-      DONE from Gate B: AUTO_PICK 4 → 2.5, END_NO_INPUT 12 → 14, END_MAX 28 → 22, REVEAL_T 2.8 → 3.4; BY follows the aspect (0.27–0.33 H);
+      DONE: AUTO_PICK 4 → 2.5, END_NO_INPUT 12 → 14, END_MAX 28 → 22, REVEAL_T 2.8 → 3.4; BY follows the aspect (0.27–0.33 H);
       window bubble y ≥ 460 (no caption overlap on 16:9); hand appears after 2 bad swaps (S.badStreak); 60 ms hit-stop on line blasts
       (S.freeze); comb reveal = stronger push-in (1.12) + brush-stroke sweep + hair sparkles; bubble tails bigger; hand wrist faded;
       locked wishes are tappable (→ store); endcard: warm light overlay 0.30, hero 680 px, layout scales with H (Y()), window patch stays
@@ -199,10 +197,10 @@ Code-drawn: bubbles, glow, padlock, board frame, goal panel, ribbon captions, li
 
 ## Phase 5e (2026-10-09, user idea: make the comb payoff readable)
 - Before-state hair is now WILD: hero_sad regenerated as an edit of the braided one with a tangled mop, NO braid, snowflakes in it; hero_comb (neat
-  glossy braid) is the payoff, so the comb reveal is "wild → combed with a braid" (critic C had it at 4/10: weakest). hero_comb / hero_comb_smile were
+  glossy braid) is the payoff, so the comb reveal is "wild → combed with a braid" (the weakest reveal). hero_comb / hero_comb_smile were
   kept (same pose, only the hair differs from the old sad, so they match the new base). Regenerated on the messy base: hero_dress, hero_dress_smile,
   hero_sad_smile, hero_frozen, hero_snow (all messy, no braid). Braided originals kept in art/ref/*_braid.png. K.PICK stays 'comb'.
-- Remaining critic-C ideas NOT done (ask first): tap hint + bubbles earlier (story 3.4 s), valid-pair highlight after 3 bad swaps, endcard hero 820 px.
+- Remaining ideas NOT done (ask first): tap hint + bubbles earlier (story 3.4 s), valid-pair highlight after 3 bad swaps, endcard hero 820 px.
 
 ## Phase 5f (2026-10-09, user: "no sound until I click")
 - Cause: browsers keep WebAudio suspended until a user gesture; our context was only created on the first tap, so even in ad webviews that allow
